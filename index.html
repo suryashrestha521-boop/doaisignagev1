@@ -145,15 +145,40 @@
     gap: 25px;
   }
 
-  /* LEFT - FEATURED NEWS */
+  /* LEFT - FEATURED NEWS (LARGE) */
   .featured-section {
-    flex: 1.2;
+    flex: 1.3;
     background: #f8fafc;
     border-radius: 12px;
     padding: 30px;
     overflow: hidden;
     position: relative;
     border: 2px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .featured-image-container {
+    width: 100%;
+    height: 320px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .featured-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .featured-image-placeholder {
+    font-size: 80px;
+    color: #94a3b8;
   }
 
   .news-badge {
@@ -166,6 +191,7 @@
     font-weight: 700;
     margin-bottom: 15px;
     text-transform: uppercase;
+    width: fit-content;
   }
 
   .featured-title {
@@ -182,6 +208,8 @@
     color: #475569;
     text-align: justify;
     margin-bottom: 25px;
+    flex: 1;
+    overflow: hidden;
   }
 
   .publish-date {
@@ -198,12 +226,11 @@
     font-size: 16px;
   }
 
-  /* RIGHT - NEWS LIST */
+  /* RIGHT - NEWS LIST (SCROLLING QUEUE) */
   .news-list-section {
     flex: 0.9;
     display: flex;
     flex-direction: column;
-    gap: 12px;
     overflow: hidden;
   }
 
@@ -227,7 +254,7 @@
     padding: 18px;
     background: #fff;
     border-radius: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     border: 1px solid #e2e8f0;
     transition: all 0.3s ease;
   }
@@ -242,8 +269,8 @@
   }
 
   .news-thumbnail {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     flex-shrink: 0;
     border-radius: 6px;
     overflow: hidden;
@@ -260,16 +287,19 @@
   }
 
   .news-thumbnail-placeholder {
-    font-size: 30px;
+    font-size: 40px;
     color: #94a3b8;
   }
 
   .news-card-content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .news-card-title {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: #1B42B8;
     margin-bottom: 8px;
@@ -424,14 +454,18 @@
 
   <!-- CONTENT AREA -->
   <div class="content-area">
-    <!-- LEFT - FEATURED NEWS -->
+    <!-- LEFT - FEATURED NEWS (LARGE WITH IMAGE) -->
     <div class="featured-section">
       <div id="featured-content">
         <div class="status-msg">Loading news...</div>
       </div>
+      <!-- Carousel dots will be shown if multiple items -->
+      <div class="carousel-dots" id="carousel-dots" style="display: none;">
+        <!-- Dots will be inserted here -->
+      </div>
     </div>
 
-    <!-- RIGHT - NEWS LIST -->
+    <!-- RIGHT - NEWS LIST (SLOW SCROLLING QUEUE) -->
     <div class="news-list-section">
       <div class="news-list-container">
         <div class="news-list-track" id="news-list-track">
@@ -439,11 +473,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- CAROUSEL DOTS -->
-  <div class="carousel-dots" id="carousel-dots">
-    <!-- Dots will be inserted here -->
   </div>
 
   <!-- TICKER -->
@@ -477,6 +506,30 @@ function guessType(t) {
   return 'news';
 }
 
+function extractImage(html, article) {
+  // Try to find image in article
+  const img = article.querySelector('img');
+  if (img && img.src) {
+    // Convert relative URLs to absolute
+    if (img.src.startsWith('/')) {
+      return 'https://ku.edu.np' + img.src;
+    }
+    return img.src;
+  }
+  
+  // Try to find image in HTML
+  const imgMatch = html.match(/<img[^>]+src="([^"]+)"[^>]*>/i);
+  if (imgMatch) {
+    let src = imgMatch[1];
+    if (src.startsWith('/')) {
+      return 'https://ku.edu.np' + src;
+    }
+    return src;
+  }
+  
+  return null;
+}
+
 function parseItems(html) {
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const items = [];
@@ -506,25 +559,29 @@ function parseItems(html) {
     // Extract description
     let desc = '';
     const descEl = article.querySelector('p, .description, .excerpt');
-    if (descEl) desc = descEl.textContent.trim().substring(0, 150) + '...';
+    if (descEl) desc = descEl.textContent.trim().substring(0, 200) + '...';
+    
+    // Extract image
+    const image = extractImage(html, article);
     
     items.push({ 
       title, 
       date: dateText, 
       type: guessType(title),
       description: desc,
-      fullContent: article.textContent.trim()
+      fullContent: article.textContent.trim(),
+      image: image
     });
   });
   
   if (items.length < 3) {
-    return parseItemsFallback(doc);
+    return parseItemsFallback(doc, html);
   }
   
   return items.length >= 3 ? items : null;
 }
 
-function parseItemsFallback(doc) {
+function parseItemsFallback(doc, html) {
   const anchors = doc.querySelectorAll('a[href*="/news-app/"]');
   const items = [];
   const seen = new Set();
@@ -550,8 +607,9 @@ function parseItemsFallback(doc) {
       title, 
       date: dateText, 
       type: guessType(title),
-      description: title.substring(0, 100) + '...',
-      fullContent: title
+      description: title.substring(0, 150) + '...',
+      fullContent: title,
+      image: null
     });
   });
   
@@ -582,34 +640,82 @@ async function loadNews() {
     throw new Error('No news items found');
   }
   
-  return items;
+  return { items, html };
 }
 
 /* RENDER FUNCTIONS */
 let featuredIndex = 0;
 let carouselInterval = null;
+let scrollInterval = null;
 
 function renderNews(result) {
   const featuredContent = document.getElementById('featured-content');
-  const listTrack = document.getElementById('news-list-track');
   const dotsContainer = document.getElementById('carousel-dots');
+  const listTrack = document.getElementById('news-list-track');
   const tickerInner = document.getElementById('ticker-inner');
 
   if (!result.success) {
     featuredContent.innerHTML = `<div class="status-msg error-msg">⚠️ ${result.error}</div>`;
+    dotsContainer.style.display = 'none';
     return;
   }
 
   const items = result.items;
+  const html = result.html || '';
   
-  // Render featured content (carousel)
+  // Render featured carousel (LEFT side - large with images)
   renderFeaturedCarousel(items, featuredContent, dotsContainer);
   
-  // Render list
-  listTrack.innerHTML = items.map(item => `
+  // Render scrolling queue (RIGHT side - slower)
+  renderScrollingQueue(items, listTrack);
+
+  // Update ticker
+  tickerInner.innerHTML = items.map(i => 
+    `<span class="ticker-item">${i.title}</span>`
+  ).join('') + 
+  '<span class="ticker-item">Department of Artificial Intelligence · Kathmandu University · doai.ku.edu.np</span>';
+
+  startFeaturedCarousel(items.length);
+}
+
+function renderFeaturedCarousel(items, container, dotsContainer) {
+  container.innerHTML = items.map((item, idx) => `
+    <div class="featured-slide" style="display: ${idx === 0 ? 'block' : 'none'}" data-index="${idx}">
+      <div class="featured-image-container">
+        ${item.image 
+          ? `<img src="${item.image}" class="featured-image" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'featured-image-placeholder\\'>📄</div>';" alt="${item.title}">`
+          : '<div class="featured-image-placeholder">📄</div>'
+        }
+      </div>
+      <div class="news-badge">${item.type}</div>
+      <div class="featured-title">${item.title}</div>
+      <div class="featured-description">${item.fullContent || item.description || 'No description available.'}</div>
+      <div class="publish-date">Publish Date <span>${item.date || 'N/A'}</span></div>
+    </div>
+  `).join('');
+
+  // Show dots if more than 1 item
+  if (items.length > 1) {
+    dotsContainer.style.display = 'flex';
+    dotsContainer.innerHTML = items.map((_, idx) => 
+      `<div class="dot ${idx === 0 ? 'active' : ''}" onclick="goToSlide(${idx})"></div>`
+    ).join('');
+  } else {
+    dotsContainer.style.display = 'none';
+  }
+}
+
+function renderScrollingQueue(items, track) {
+  // Duplicate items for seamless looping
+  const duplicatedItems = [...items, ...items];
+  
+  track.innerHTML = duplicatedItems.map(item => `
     <div class="news-card">
       <div class="news-thumbnail">
-        <div class="news-thumbnail-placeholder">📄</div>
+        ${item.image 
+          ? `<img src="${item.image}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'news-thumbnail-placeholder\\'>📄</div>';" alt="${item.title}">`
+          : '<div class="news-thumbnail-placeholder">📄</div>'
+        }
       </div>
       <div class="news-card-content">
         <div class="news-card-title">${item.title}</div>
@@ -618,31 +724,6 @@ function renderNews(result) {
       </div>
     </div>
   `).join('');
-
-  // Update ticker
-  tickerInner.innerHTML = items.map(i => 
-    `<span class="ticker-item">${i.title}</span>`
-  ).join('') + 
-  '<span class="ticker-item">Department of Artificial Intelligence · Kathmandu University · doai.ku.edu.np</span>';
-
-  startListScroll();
-  startFeaturedCarousel(items.length);
-}
-
-function renderFeaturedCarousel(items, container, dotsContainer) {
-  container.innerHTML = items.map((item, idx) => `
-    <div class="featured-slide" style="display: ${idx === 0 ? 'block' : 'none'}" data-index="${idx}">
-      <div class="news-badge">${item.type}</div>
-      <div class="featured-title">${item.title}</div>
-      <div class="featured-description">${item.fullContent || item.description || 'No description available.'}</div>
-      <div class="publish-date">Publish Date <span>${item.date || 'N/A'}</span></div>
-    </div>
-  `).join('');
-
-  // Create dots
-  dotsContainer.innerHTML = items.map((_, idx) => 
-    `<div class="dot ${idx === 0 ? 'active' : ''}" onclick="goToSlide(${idx})"></div>`
-  ).join('');
 }
 
 function goToSlide(index) {
@@ -664,7 +745,7 @@ function startFeaturedCarousel(totalItems) {
   carouselInterval = setInterval(() => {
     const nextIndex = (featuredIndex + 1) % totalItems;
     goToSlide(nextIndex);
-  }, 8000);
+  }, 10000); // 10 seconds per slide
 }
 
 function resetCarousel() {
@@ -673,35 +754,48 @@ function resetCarousel() {
   startFeaturedCarousel(totalItems);
 }
 
-function startListScroll() {
+function startScrollingQueue() {
   const track = document.getElementById('news-list-track');
   const container = document.querySelector('.news-list-container');
   
-  let position = 0;
-  const speed = 30;
+  if (scrollInterval) clearInterval(scrollInterval);
   
-  function scroll() {
-    const maxScroll = track.scrollHeight - container.clientHeight;
+  let position = 0;
+  const cardHeight = 135; // Approximate height of each card including margin
+  const totalItems = track.children.length;
+  const originalItems = totalItems / 2; // We duplicated items
+  
+  // VERY SLOW scroll - 1.5 seconds per card
+  const scrollSpeed = 1500; // milliseconds per card
+  
+  function scrollStep() {
+    const maxScroll = (originalItems * cardHeight) - container.clientHeight;
+    
     if (maxScroll <= 0) return;
     
-    position += speed;
-    if (position >= maxScroll) position = 0;
+    position += 1; // Move 1 pixel at a time
+    
+    if (position >= maxScroll) {
+      position = 0; // Reset to top
+    }
     
     track.style.transform = `translateY(-${position}px)`;
-    requestAnimationFrame(scroll);
   }
   
-  scroll();
+  scrollInterval = setInterval(scrollStep, scrollSpeed / cardHeight);
 }
+
+// Start scrolling after content loads
+setTimeout(startScrollingQueue, 1000);
 
 /* INIT */
 loadNews()
-  .then(items => renderNews({ success: true, items }))
+  .then(data => renderNews({ success: true, items: data.items, html: data.html }))
   .catch(err => renderNews({ success: false, error: err.message }));
 
 setInterval(() => {
   loadNews()
-    .then(items => renderNews({ success: true, items }))
+    .then(data => renderNews({ success: true, items: data.items, html: data.html }))
     .catch(err => renderNews({ success: false, error: err.message }));
 }, 30 * 60 * 1000);
 </script>
