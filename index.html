@@ -515,31 +515,66 @@ function guessType(t) {
   return 'news';
 }
 
-// IMPROVED IMAGE EXTRACTION
+// IMPROVED IMAGE EXTRACTION FUNCTION
 function extractImage(article, baseUrl) {
-  // Strategy 1: Look for img tags in the article
-  const imgs = article.querySelectorAll('img');
-  for (let img of imgs) {
-    let src = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src');
-    if (src) {
-      src = src.trim();
-      if (src.startsWith('/')) src = baseUrl + src;
-      else if (src.startsWith('./')) src = baseUrl + src.substring(1);
-      else if (!src.startsWith('http')) src = baseUrl + '/' + src;
-      return src;
+  // Strategy 1: Look for img tags with various attributes
+  const imgSelectors = [
+    'img',
+    '.news-thumbnail img',
+    '.article-image img', 
+    '.post-thumbnail img',
+    '.featured-image img',
+    '.attachment img'
+  ];
+  
+  for (let selector of imgSelectors) {
+    const img = article.querySelector(selector);
+    if (img) {
+      let src = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || img.getAttribute('data-original');
+      if (src && src.trim()) {
+        src = src.trim();
+        // Convert relative to absolute URL
+        if (src.startsWith('/')) {
+          src = baseUrl + src;
+        } else if (src.startsWith('./')) {
+          src = baseUrl + src.substring(1);
+        } else if (!src.startsWith('http') && !src.startsWith('data:')) {
+          src = baseUrl + '/' + src;
+        }
+        return src;
+      }
     }
   }
   
-  // Strategy 2: Look for background images
+  // Strategy 2: Look for background images in style attributes
   const elementsWithBg = article.querySelectorAll('[style*="background-image"]');
   for (let el of elementsWithBg) {
     const style = el.getAttribute('style');
-    const match = style.match(/url\(['"]?([^'")]+)['"]?\)/);
-    if (match) {
-      let src = match[1].trim();
-      if (src.startsWith('/')) src = baseUrl + src;
-      else if (!src.startsWith('http')) src = baseUrl + '/' + src;
-      return src;
+    if (style) {
+      const match = style.match(/url\(['"]?([^'")]+)['"]?\)/);
+      if (match && match[1]) {
+        let src = match[1].trim();
+        if (src.startsWith('/')) {
+          src = baseUrl + src;
+        } else if (!src.startsWith('http') && !src.startsWith('data:')) {
+          src = baseUrl + '/' + src;
+        }
+        return src;
+      }
+    }
+  }
+  
+  // Strategy 3: Look for links to images
+  const imgLinks = article.querySelectorAll('a[href$=".jpg"], a[href$=".jpeg"], a[href$=".png"], a[href$=".gif"]');
+  for (let link of imgLinks) {
+    let href = link.getAttribute('href');
+    if (href) {
+      if (href.startsWith('/')) {
+        return baseUrl + href;
+      } else if (!href.startsWith('http')) {
+        return baseUrl + '/' + href;
+      }
+      return href;
     }
   }
   
@@ -551,16 +586,22 @@ function parseItems(html, baseUrl = 'https://ku.edu.np') {
   const items = [];
   const seen = new Set();
   
-  // Try to find news articles - multiple possible selectors
+  // Try multiple selectors to find news articles
   const selectors = [
-    '.news-item', '.article-item', '.news-card', '.article-card',
-    'article', '[class*="news"]', '[class*="article"]',
-    '.post', '.entry'
+    '.news-item',
+    '.article-item', 
+    '.news-card',
+    '.article-card',
+    'article',
+    '.post',
+    '.entry',
+    '[class*="news"]',
+    '[class*="article"]'
   ];
   
   let articles = [];
   for (let selector of selectors) {
-    articles = doc.querySelectorAll(selector);
+    articles = Array.from(doc.querySelectorAll(selector));
     if (articles.length >= 3) break;
   }
   
@@ -599,7 +640,7 @@ function parseItems(html, baseUrl = 'https://ku.edu.np') {
       if (desc.length > 200) desc = desc.substring(0, 200) + '...';
     }
     
-    // Extract image
+    // Extract image using improved function
     const image = extractImage(article, baseUrl);
     
     items.push({ 
@@ -679,7 +720,11 @@ async function loadNews() {
   if (!res.ok) throw new Error('Server returned HTTP ' + res.status);
   
   const html = await res.text();
-  const items = parseItems(html, 'https://ku.edu.np') || parseItemsFallback(new DOMParser().parseFromString(html, 'text/html'), html, 'https://ku.edu.np');
+  let items = parseItems(html, 'https://ku.edu.np');
+  
+  if (!items || items.length === 0) {
+    items = parseItemsFallback(new DOMParser().parseFromString(html, 'text/html'), html, 'https://ku.edu.np');
+  }
   
   if (!items || items.length === 0) {
     throw new Error('No news items found');
@@ -723,7 +768,7 @@ function renderFeaturedCarousel(items, container, dotsContainer) {
     <div class="featured-slide" style="display: ${idx === 0 ? 'block' : 'none'}" data-index="${idx}">
       <div class="featured-image-wrapper">
         ${item.image 
-          ? `<img src="${item.image}" class="featured-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" alt="${item.title}">`
+          ? `<img src="${item.image}" class="featured-image" onerror="console.log('Image failed:', '${item.image}'); this.style.display='none'; this.nextElementSibling.style.display='flex';" alt="${item.title}">`
           : ''
         }
         <div class="featured-image-placeholder" style="${item.image ? 'display:none;' : 'display:flex;'}">📄</div>
