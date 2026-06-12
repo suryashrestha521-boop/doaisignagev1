@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KU Department of AI - News & Announcements</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -16,7 +16,6 @@
     padding: 1.5vh;
   }
 
-  /* MAIN CONTAINER - 16:9 ASPECT RATIO */
   .main-container {
     width: 100%;
     height: 100%;
@@ -28,7 +27,6 @@
     box-shadow: 0 10px 50px rgba(0,0,0,0.3);
   }
 
-  /* TOP HEADER */
   .top-header {
     display: flex;
     align-items: center;
@@ -68,7 +66,6 @@
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 0.5vh;
-    line-height: 1.2;
   }
 
   .dept-title p {
@@ -105,7 +102,6 @@
     color: #333;
   }
 
-  /* BLUE BANNER */
   .blue-banner {
     background: linear-gradient(135deg, #1B42B8 0%, #2563EB 100%);
     padding: 3vh 3.5vh;
@@ -138,10 +134,8 @@
     font-weight: 700;
     text-decoration: none;
     box-shadow: 0 4px 15px rgba(0,151,167,0.3);
-    white-space: nowrap;
   }
 
-  /* CONTENT AREA */
   .content-area {
     flex: 1;
     display: flex;
@@ -150,14 +144,12 @@
     gap: 3vh;
   }
 
-  /* LEFT - FEATURED NEWS (LARGE WITH IMAGE) */
   .featured-section {
     flex: 1.3;
     background: #f8fafc;
     border-radius: 12px;
     padding: 3vh;
     overflow: hidden;
-    position: relative;
     border: 2px solid #e2e8f0;
     display: flex;
     flex-direction: column;
@@ -232,7 +224,6 @@
     font-size: 1.8vh;
   }
 
-  /* RIGHT - NEWS LIST (SLOW SCROLLING QUEUE) */
   .news-list-section {
     flex: 0.9;
     display: flex;
@@ -331,7 +322,6 @@
     color: #1B42B8;
   }
 
-  /* CAROUSEL DOTS */
   .carousel-dots {
     display: flex;
     justify-content: center;
@@ -357,7 +347,6 @@
     background: #1B42B8;
   }
 
-  /* TICKER */
   .ticker-bar {
     background: #1B42B8;
     height: 5vh;
@@ -410,7 +399,6 @@
     margin-right: 1vh;
   }
 
-  /* LOADING & ERROR STATES */
   .status-msg {
     padding: 6vh;
     font-size: 2.2vh;
@@ -422,29 +410,11 @@
     color: #ef4444;
     font-weight: 600;
   }
-
-  /* Ensure proper scaling on different screen sizes */
-  @media screen and (max-aspect-ratio: 16/9) {
-    .main-container {
-      max-width: 100vw;
-      max-height: 56.25vw; /* 9/16 * 100 */
-      margin: auto;
-    }
-  }
-
-  @media screen and (min-aspect-ratio: 16/9) {
-    .main-container {
-      max-height: 100vh;
-      max-width: 177.78vh; /* 16/9 * 100 */
-      margin: auto;
-    }
-  }
 </style>
 </head>
 <body>
 <div class="main-container">
   
-  <!-- TOP HEADER -->
   <div class="top-header">
     <div class="header-left">
       <div class="ku-logo">
@@ -468,7 +438,6 @@
     </div>
   </div>
 
-  <!-- BLUE BANNER -->
   <div class="blue-banner">
     <div class="banner-title">
       <h2>KU Department of AI</h2>
@@ -477,30 +446,21 @@
     <div class="banner-link">ku.edu.np/news-app</div>
   </div>
 
-  <!-- CONTENT AREA -->
   <div class="content-area">
-    <!-- LEFT - FEATURED NEWS (LARGE WITH IMAGE) -->
     <div class="featured-section">
       <div id="featured-content">
         <div class="status-msg">Loading news...</div>
       </div>
-      <!-- Carousel dots will be shown if multiple items -->
-      <div class="carousel-dots" id="carousel-dots" style="display: none;">
-        <!-- Dots will be inserted here -->
-      </div>
+      <div class="carousel-dots" id="carousel-dots" style="display: none;"></div>
     </div>
 
-    <!-- RIGHT - NEWS LIST (SLOW SCROLLING QUEUE) -->
     <div class="news-list-section">
       <div class="news-list-container">
-        <div class="news-list-track" id="news-list-track">
-          <!-- News cards will be inserted here -->
-        </div>
+        <div class="news-list-track" id="news-list-track"></div>
       </div>
     </div>
   </div>
 
-  <!-- TICKER -->
   <div class="ticker-bar">
     <div class="ticker-label">KU Department of AI</div>
     <div class="ticker-track">
@@ -513,7 +473,6 @@
 </div>
 
 <script>
-/* CLOCK & TIME */
 function updateTime() {
   const n = new Date();
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -523,7 +482,6 @@ function updateTime() {
 updateTime();
 setInterval(updateTime, 60000);
 
-/* DATA PARSING */
 function guessType(t) {
   const s = t.toLowerCase();
   if (s.includes('workshop') || s.includes('fest') || s.includes('seminar')) return 'event';
@@ -531,46 +489,57 @@ function guessType(t) {
   return 'news';
 }
 
-function extractImage(html, article) {
-  const img = article.querySelector('img');
-  if (img && img.src) {
-    if (img.src.startsWith('/')) {
-      return 'https://ku.edu.np' + img.src;
+function extractImage(article, baseUrl) {
+  // Try multiple strategies to find image
+  const strategies = [
+    () => article.querySelector('img'),
+    () => article.querySelector('.news-thumbnail img, .article-image img, .post-thumbnail img'),
+    () => {
+      const style = article.querySelector('[style*="background-image"]');
+      if (style) {
+        const match = style.style.backgroundImage.match(/url\(['"]?([^'")]+)['"]?\)/);
+        if (match) return { src: match[1] };
+      }
+      return null;
     }
-    return img.src;
-  }
-  
-  const imgMatch = html.match(/<img[^>]+src="([^"]+)"[^>]*>/i);
-  if (imgMatch) {
-    let src = imgMatch[1];
-    if (src.startsWith('/')) {
-      return 'https://ku.edu.np' + src;
+  ];
+
+  for (const strategy of strategies) {
+    const img = strategy();
+    if (img && img.src) {
+      let src = img.src.trim();
+      if (src.startsWith('/')) {
+        src = baseUrl + src;
+      } else if (src.startsWith('./')) {
+        src = baseUrl + src.substring(1);
+      }
+      return src;
     }
-    return src;
   }
   
   return null;
 }
 
-function parseItems(html) {
+function parseItems(html, baseUrl = 'https://ku.edu.np') {
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const items = [];
   const seen = new Set();
   
-  const articles = doc.querySelectorAll('.news-item, .article-item, [class*="news"], [class*="article"]');
+  const articles = doc.querySelectorAll('.news-item, .article-item, [class*="news-card"], [class*="article-card"], article');
   
   articles.forEach(article => {
-    const titleLink = article.querySelector('h3 a, h2 a, .title a, a[href*="/news/"]');
+    const titleLink = article.querySelector('h3 a, h2 a, h4 a, .title a, a[href*="/news/"]');
     if (!titleLink) return;
     
     const title = titleLink.textContent.trim();
     if (!title || title.length < 10) return;
     if (/^\d{4}-\d{2}-\d{2}/.test(title)) return;
+    if (title.toLowerCase().includes('more')) return;
     if (seen.has(title)) return;
     seen.add(title);
     
     let dateText = '';
-    const dateEl = article.querySelector('.date, .post-date, time, [class*="date"]');
+    const dateEl = article.querySelector('.date, .post-date, time, [class*="date"], .publish-date');
     if (dateEl) {
       dateText = dateEl.textContent.trim();
     } else {
@@ -579,10 +548,13 @@ function parseItems(html) {
     }
     
     let desc = '';
-    const descEl = article.querySelector('p, .description, .excerpt');
-    if (descEl) desc = descEl.textContent.trim().substring(0, 200) + '...';
+    const descEl = article.querySelector('p, .description, .excerpt, .summary');
+    if (descEl) {
+      desc = descEl.textContent.trim();
+      if (desc.length > 200) desc = desc.substring(0, 200) + '...';
+    }
     
-    const image = extractImage(html, article);
+    const image = extractImage(article, baseUrl);
     
     items.push({ 
       title, 
@@ -595,14 +567,14 @@ function parseItems(html) {
   });
   
   if (items.length < 3) {
-    return parseItemsFallback(doc, html);
+    return parseItemsFallback(doc, html, baseUrl);
   }
   
   return items.length >= 3 ? items : null;
 }
 
-function parseItemsFallback(doc, html) {
-  const anchors = doc.querySelectorAll('a[href*="/news-app/"]');
+function parseItemsFallback(doc, html, baseUrl = 'https://ku.edu.np') {
+  const anchors = doc.querySelectorAll('a[href*="/news/"], a[href*="/news-app/"]');
   const items = [];
   const seen = new Set();
   
@@ -615,28 +587,39 @@ function parseItemsFallback(doc, html) {
     seen.add(title);
     
     let dateText = '';
-    let el = a.parentElement;
-    for (let i = 0; i < 6; i++) {
-      if (!el) break;
-      const m = el.textContent.match(/(\d{4}-\d{2}-\d{2}(?:,\s*\w+)?)/);
-      if (m) { dateText = m[1]; break; }
-      el = el.parentElement;
+    let parent = a.closest('article, .news-item, .article-item, [class*="card"]') || a.parentElement;
+    
+    if (parent) {
+      const dateEl = parent.querySelector('.date, .post-date, time, [class*="date"]');
+      if (dateEl) dateText = dateEl.textContent.trim();
+      
+      if (!dateText) {
+        const dateMatch = parent.textContent.match(/(\d{4}-\d{2}-\d{2}(?:,\s*\w+)?)/);
+        if (dateMatch) dateText = dateMatch[1];
+      }
     }
+    
+    let desc = '';
+    if (parent) {
+      const descEl = parent.querySelector('p, .description');
+      if (descEl) desc = descEl.textContent.trim().substring(0, 200) + '...';
+    }
+    
+    const image = extractImage(a.closest('article, .news-item, .article-item') || parent, baseUrl);
     
     items.push({ 
       title, 
       date: dateText, 
       type: guessType(title),
-      description: title.substring(0, 150) + '...',
-      fullContent: title,
-      image: null
+      description: desc,
+      fullContent: title + (desc ? ' ' + desc : ''),
+      image: image
     });
   });
   
   return items.length >= 3 ? items : null;
 }
 
-/* FETCH NEWS */
 const KU_NEWS = '/.netlify/functions/fetch-news';
 
 async function loadNews() {
@@ -654,7 +637,7 @@ async function loadNews() {
   if (!res.ok) throw new Error('Server returned HTTP ' + res.status);
   
   const html = await res.text();
-  const items = parseItems(html);
+  const items = parseItems(html, 'https://ku.edu.np');
   
   if (!items || items.length === 0) {
     throw new Error('No news items found');
@@ -663,7 +646,6 @@ async function loadNews() {
   return { items, html };
 }
 
-/* RENDER FUNCTIONS */
 let featuredIndex = 0;
 let carouselInterval = null;
 let scrollInterval = null;
@@ -681,7 +663,6 @@ function renderNews(result) {
   }
 
   const items = result.items;
-  const html = result.html || '';
   
   renderFeaturedCarousel(items, featuredContent, dotsContainer);
   renderScrollingQueue(items, listTrack);
@@ -692,7 +673,7 @@ function renderNews(result) {
   '<span class="ticker-item">Department of Artificial Intelligence · Kathmandu University · doai.ku.edu.np</span>';
 
   startFeaturedCarousel(items.length);
-  startScrollingQueue();
+  setTimeout(startScrollingQueue, 1000);
 }
 
 function renderFeaturedCarousel(items, container, dotsContainer) {
@@ -700,9 +681,10 @@ function renderFeaturedCarousel(items, container, dotsContainer) {
     <div class="featured-slide" style="display: ${idx === 0 ? 'block' : 'none'}" data-index="${idx}">
       <div class="featured-image-container">
         ${item.image 
-          ? `<img src="${item.image}" class="featured-image" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'featured-image-placeholder\\'>📄</div>';" alt="${item.title}">`
-          : '<div class="featured-image-placeholder">📄</div>'
+          ? `<img src="${item.image}" class="featured-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" alt="${item.title}">`
+          : ''
         }
+        <div class="featured-image-placeholder" style="${item.image ? 'display:none;' : 'display:flex;'}">📄</div>
       </div>
       <div class="news-badge">${item.type}</div>
       <div class="featured-title">${item.title}</div>
@@ -728,9 +710,10 @@ function renderScrollingQueue(items, track) {
     <div class="news-card">
       <div class="news-thumbnail">
         ${item.image 
-          ? `<img src="${item.image}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'news-thumbnail-placeholder\\'>📄</div>';" alt="${item.title}">`
-          : '<div class="news-thumbnail-placeholder">📄</div>'
+          ? `<img src="${item.image}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" alt="${item.title}">`
+          : ''
         }
+        <div class="news-thumbnail-placeholder" style="${item.image ? 'display:none;' : 'display:flex;'}">📄</div>
       </div>
       <div class="news-card-content">
         <div class="news-card-title">${item.title}</div>
@@ -799,7 +782,6 @@ function startScrollingQueue() {
   scrollInterval = setInterval(scrollStep, scrollSpeed / cardHeight);
 }
 
-/* INIT */
 loadNews()
   .then(data => renderNews({ success: true, items: data.items, html: data.html }))
   .catch(err => renderNews({ success: false, error: err.message }));
