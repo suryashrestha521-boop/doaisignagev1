@@ -14,24 +14,84 @@ exports.handler = async function(event, context) {
     
     const html = await response.text();
     
+    // Parse HTML to extract news items with images
+    const { JSDOM } = require('jsdom');
+    const dom = new JSDOM(html);
+    const doc = dom.window.document;
+    
+    const items = [];
+    const seen = new Set();
+    
+    // Find all news articles
+    const articles = doc.querySelectorAll('.news-item, .article-item, .post, [class*="news"]');
+    
+    articles.forEach(article => {
+      const titleLink = article.querySelector('h3 a, h2 a, h4 a, .title a');
+      if (!titleLink) return;
+      
+      const title = titleLink.textContent.trim();
+      if (!title || title.length < 10 || seen.has(title)) return;
+      seen.add(title);
+      
+      // Extract image
+      let imageUrl = null;
+      const img = article.querySelector('img');
+      if (img) {
+        imageUrl = img.src || img.getAttribute('data-src');
+        if (imageUrl && imageUrl.startsWith('/')) {
+          imageUrl = 'https://ku.edu.np' + imageUrl;
+        }
+      }
+      
+      // Extract date
+      let dateText = '';
+      const dateEl = article.querySelector('.date, .post-date, time');
+      if (dateEl) {
+        dateText = dateEl.textContent.trim();
+      }
+      
+      // Extract description
+      let desc = '';
+      const descEl = article.querySelector('p');
+      if (descEl) {
+        desc = descEl.textContent.trim().substring(0, 200);
+      }
+      
+      items.push({
+        title,
+        date: dateText,
+        description: desc,
+        image: imageUrl,
+        type: title.toLowerCase().includes('notice') ? 'notice' : 
+              title.toLowerCase().includes('event') ? 'event' : 'news'
+      });
+    });
+    
     return {
       statusCode: 200,
       headers: {
-        'Content-Type': 'text/html',
+        'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
         'Cache-Control': 'public, max-age=300'
       },
-      body: html
+      body: JSON.stringify({
+        success: true,
+        items: items.slice(0, 10),
+        timestamp: new Date().toISOString()
+      })
     };
   } catch (error) {
-    console.error('Fetch error:', error);
+    console.error('Error:', error);
     return {
       statusCode: 500,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ error: error.message })
+      body: JSON.stringify({ 
+        success: false, 
+        error: error.message 
+      })
     };
   }
 };
