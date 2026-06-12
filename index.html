@@ -631,7 +631,7 @@ function parseItemsFallback(doc, html, baseUrl) {
   return items.length >= 3 ? items : null;
 }
 
-const KU_NEWS = '/.netlify/functions/fetch-news';
+const KU_NEWS = '/api/fetch-news';
 
 async function loadNews() {
   const timeoutPromise = new Promise((_, reject) => 
