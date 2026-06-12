@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>DoAI – News & Announcements</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: #1B42B8;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+
+  /* OUTER FRAME */
+  .frame {
+    width: 1920px;
+    height: 1080px;
+    background: #1B42B8;
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* WHITE CARD */
+  .card {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.28);
+  }
+
+  /* TOP HEADER ROW */
+  .card-header {
+    display: flex;
+    align-items: center;
+    padding: 16px 40px;
+    border-bottom: 1.5px solid #e8e8e8;
+    flex-shrink: 0;
+    background: #fff;
+    gap: 22px;
+  }
+
+  .ku-logo {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2.5px solid #8B1A2A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+  }
+  .ku-logo img {
+    width: 68px;
+    height: 68px;
+    object-fit: contain;
+  }
+  .ku-logo-txt {
+    font-size: 18px;
+    font-weight: 800;
+    color: #8B1A2A;
+    text-align: center;
+    line-height: 1;
+  }
+  .ku-logo-txt small { display: block; font-size: 9px; font-weight: 600; letter-spacing: 1.5px; margin-top: 2px; }
+
+  .dept-info { flex: 1; }
+  .dept-info h1 { font-size: 25px; font-weight: 700; color: #1a1a1a; line-height: 1.2; }
+  .dept-info p  { font-size: 16px; color: #555; margin-top: 3px; }
+
+  .header-stats { display: flex; align-items: center; flex-shrink: 0; }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 30px;
+    border-left: 1.5px solid #ddd;
+  }
+  .stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #1B42B8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .stat-icon svg { width: 26px; height: 26px; fill: #fff; }
+  .stat-text strong { display: block; font-size: 19px; font-weight: 700; color: #1a1a1a; line-height: 1.1; }
+  .stat-text span   { font-size: 12px; color: #666; }
+
+  /* TEAL BANNER */
+  .section-banner {
+    background: linear-gradient(135deg, #0097A7 0%, #00BCD4 45%, #1B42B8 100%);
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    gap: 16px;
+  }
+  .section-banner::after {
+    content: '';
+    position: absolute;
+    right: 60px;
+    top: -10px;
+    width: 180px;
+    height: 90px;
+    background: rgba(255,255,255,0.07);
+    transform: skewX(-18deg);
+    border-radius: 4px;
+  }
+  .section-banner h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+  }
+  .live-badge {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00FF87;
+    animation: blink 1.4s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .banner-right {
+    margin-left: auto;
+    font-size: 14px;
+    color: rgba(255,255,255,0.72);
+    letter-spacing: 1px;
+  }
+
+  /* NEWS SCROLL AREA */
+  .news-area {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    background: #fff;
+  }
+  .scroll-track {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 0 40px;
+    will-change: transform;
+  }
+
+  .news-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid #F2F2F2;
+  }
+
+  .item-num {
+    flex-shrink: 0;
+    font-size: 30px;
+    font-weight: 800;
+    color: #EBEBEB;
+    min-width: 46px;
+    text-align: right;
+    line-height: 1;
+  }
+
+  .news-badge {
+    flex-shrink: 0;
+    border-radius: 5px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    min-width: 80px;
+    text-align: center;
+  }
+  .badge-notice { background: #EEF2FF; color: #3730A3; border: 1.5px solid #C7D2FE; }
+  .badge-news   { background: #ECFDF5; color: #065F46; border: 1.5px solid #6EE7B7; }
+  .badge-event  { background: #FFF7ED; color: #92400E; border: 1.5px solid #FCD34D; }
+
+  .news-content { flex: 1; }
+  .news-title { font-size: 21px; font-weight: 600; color: #1a1a1a; line-height: 1.35; }
+  .news-date  { font-size: 13px; color: #999; margin-top: 5px; }
+
+  /* TICKER */
+  .ticker-bar {
+    background: #1B42B8;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .ticker-label {
+    background: #1230A0;
+    padding: 0 24px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .ticker-label svg { width: 15px; height: 15px; fill: rgba(255,255,255,0.8); }
+  .ticker-track { overflow: hidden; flex: 1; height: 100%; position: relative; }
+  .ticker-inner {
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    white-space: nowrap;
+    will-change: transform;
+  }
+  .ticker-item { font-size: 14px; color: rgba(255,255,255,0.88); padding: 0 44px; }
+  .ticker-item::before { content: "◆  "; font-size: 8px; opacity: 0.55; }
+
+  .status-msg { padding: 50px 0; font-size: 20px; color: #bbb; text-align: center; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="card">
+
+    <!-- TOP HEADER -->
+    <div class="card-header">
+      <div class="ku-logo">
+        <img id="ku-img"
+             src="https://ku.edu.np/public/uploads/1643958563ku-logo.png"
+             onerror="this.style.display='none'; document.getElementById('ku-txt').style.display='block';"
+             alt="KU">
+        <div class="ku-logo-txt" id="ku-txt" style="display:none;">KU<small>NEPAL</small></div>
+      </div>
+
+      <div class="dept-info">
+        <h1>Department of Artificial Intelligence</h1>
+        <p>School of Engineering, KU</p>
+      </div>
+
+      <div class="header-stats">
+        <div class="stat-item">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+          </div>
+          <div class="stat-text">
+            <strong id="clock-val">--:--</strong>
+            <span id="date-val">Loading</span>
+          </div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+          </div>
+          <div class="stat-text">
+            <strong id="count-val">—</strong>
+            <span>Announcements</span>
+          </div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          </div>
+          <div class="stat-text">
+            <strong>doai.ku.edu.np</strong>
+            <span>Official Website</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAL SECTION BANNER -->
+    <div class="section-banner">
+      <h2>News &amp; Announcements</h2>
+      <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+      <span class="banner-right" id="banner-count"></span>
+    </div>
+
+    <!-- NEWS LIST -->
+    <div class="news-area">
+      <div class="scroll-track" id="scroll-track">
+        <div class="status-msg" id="loading-msg">Fetching latest updates from KU…</div>
+      </div>
+    </div>
+
+    <!-- TICKER -->
+    <div class="ticker-bar">
+      <div class="ticker-label">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+        DoAI · KU
+      </div>
+      <div class="ticker-track">
+        <div class="ticker-inner" id="ticker-inner">
+          <span class="ticker-item">Department of Artificial Intelligence — Kathmandu University, Dhulikhel, Nepal</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* CLOCK */
+function tick() {
+  const n = new Date();
+  document.getElementById('clock-val').textContent =
+    String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+  const D = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('date-val').textContent =
+    D[n.getDay()] + ' ' + n.getDate() + ' ' + M[n.getMonth()] + ' ' + n.getFullYear();
+}
+tick(); setInterval(tick, 1000);
+
+function guessType(t) {
+  const s = t.toLowerCase();
+  if (s.includes('workshop') || s.includes('fest') || s.includes('seminar') || (s.includes('orientation') && s.includes('program'))) return 'event';
+  if (s.includes('admission') || s.includes('selection') || s.includes('eoi') || s.includes('interview') || s.includes('notice') || s.includes('defence')) return 'notice';
+  return 'news';
+}
+
+function parseItems(html) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const anchors = doc.querySelectorAll('a[href*="/news-app/"]');
+  const items = [], seen = new Set();
+  anchors.forEach(a => {
+    const title = a.textContent.trim();
+    if (!title || title.length < 6 || seen.has(title)) return;
+    seen.add(title);
+    let dateText = '';
+    let el = a.parentElement;
+    for (let i = 0; i < 6; i++) {
+      if (!el) break;
+      const m = el.textContent.match(/(\d{4}-\d{2}-\d{2}(?:,\s*\w+)?)/);
+      if (m) { dateText = m[1]; break; }
+      el = el.parentElement;
+    }
+    items.push({ title, date: dateText, type: guessType(title) });
+  });
+  return items.length >= 3 ? items : null;
+}
+
+// 🎯 POINT TO NETLIFY FUNCTION (Server-side proxy)
+const KU_NEWS = '/.netlify/functions/fetch-news';
+
+// 🚀 FETCH WITH TIMEOUT
+async function loadNews() {
+  const timeoutPromise = new Promise((_, reject) => 
+    setTimeout(() => reject(new Error('Request timed out after 10 seconds')), 10000)
+  );
+  
+  let res;
+  try {
+    res = await Promise.race([fetch(KU_NEWS), timeoutPromise]);
+  } catch (e) {
+    throw new Error('Network error: ' + e.message);
+  }
+
+  if (!res.ok) throw new Error('Server returned HTTP ' + res.status);
+  
+  const html = await res.text();
+  const items = parseItems(html);
+  
+  if (!items || items.length === 0) {
+    throw new Error('No news items found');
+  }
+  
+  return items;
+}
+
+function badgeCls(type) { return type === 'event' ? 'badge-event' : type === 'news' ? 'badge-news' : 'badge-notice'; }
+function badgeLbl(type) { return type === 'event' ? 'Event' : type === 'news' ? 'News' : 'Notice'; }
+
+function renderNews(result) {
+  const track = document.getElementById('scroll-track');
+  const tickerInner = document.getElementById('ticker-inner');
+
+  // 🚨 HANDLE FAILURE
+  if (!result.success) {
+    document.getElementById('count-val').textContent = '0';
+    document.getElementById('banner-count').textContent = 'Error';
+    
+    track.innerHTML = `
+      <div class="status-msg" style="color: #e53e3e; font-weight: 600; font-size: 22px; padding-top: 100px;">
+        ⚠️ Failed to fetch live data
+        <div style="font-size: 16px; color: #555; font-weight: 400; margin-top: 12px; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+          Reason: <strong>${result.error}</strong><br>
+          <span style="font-size: 14px; color: #888; margin-top: 8px; display: block;">
+            Please check if Netlify Function is deployed correctly at: /.netlify/functions/fetch-news
+          </span>
+        </div>
+      </div>
+    `;
+    
+    tickerInner.innerHTML = `<span class="ticker-item" style="color:#ff6b6b; font-weight:bold;">⚠️ FETCH FAILED: ${result.error}</span>`;
+    startTicker();
+    return;
+  }
+
+  // ✅ HANDLE SUCCESS
+  const items = result.items;
+  document.getElementById('count-val').textContent = items.length;
+  document.getElementById('banner-count').textContent = items.length + ' items';
+
+  const doubled = [...items, ...items];
+  track.innerHTML = doubled.map((item, i) => `
+    <div class="news-item">
+      <span class="item-num">${String((i % items.length) + 1).padStart(2,'0')}</span>
+      <span class="news-badge ${badgeCls(item.type)}">${badgeLbl(item.type)}</span>
+      <div class="news-content">
+        <div class="news-title">${item.title}</div>
+        ${item.date ? '<div class="news-date">' + item.date + '</div>' : ''}
+      </div>
+    </div>`).join('');
+
+  tickerInner.innerHTML = 
+    items.map(i => `<span class="ticker-item">${i.title}${i.date ? '  ·  ' + i.date : ''}</span>`).join('') +
+    '<span class="ticker-item">Department of Artificial Intelligence · Kathmandu University · doai.ku.edu.np · ai_office@ku.edu.np · +977-11-499429</span>';
+
+  startScroll();
+  startTicker();
+}
+
+/* VERTICAL AUTO-SCROLL */
+let vsRAF = null;
+function startScroll() {
+  const track = document.getElementById('scroll-track');
+  if (vsRAF) cancelAnimationFrame(vsRAF);
+  
+  if (track.scrollHeight <= track.clientHeight) {
+    track.style.transform = 'translateY(0)';
+    return;
+  }
+
+  setTimeout(() => {
+    const halfH = track.scrollHeight / 2;
+    const speed = 52; 
+    let startT  = null;
+    function step(ts) {
+      if (!startT) startT = ts;
+      const moved = ((ts - startT) / 1000 * speed) % halfH;
+      track.style.transform = 'translateY(-' + moved + 'px)';
+      vsRAF = requestAnimationFrame(step);
+    }
+    vsRAF = requestAnimationFrame(step);
+  }, 300);
+}
+
+/* HORIZONTAL TICKER */
+function startTicker() {
+  const inner = document.getElementById('ticker-inner');
+  const wrap  = document.querySelector('.ticker-track');
+  
+  if (inner.scrollWidth <= wrap.clientWidth) {
+    inner.style.transform = 'translateX(0)';
+    return;
+  }
+
+  let pos = wrap.clientWidth, last = null;
+  function step(ts) {
+    if (!last) last = ts;
+    pos -= 130 * (ts - last) / 1000;
+    if (pos < -inner.scrollWidth) pos = wrap.clientWidth;
+    inner.style.transform = 'translateX(' + pos + 'px)';
+    last = ts;
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* INIT */
+loadNews()
+  .then(items => renderNews({ success: true, items }))
+  .catch(err => renderNews({ success: false, error: err.message }));
+
+// Refresh every 30 minutes
+setInterval(() => {
+  loadNews()
+    .then(items => renderNews({ success: true, items }))
+    .catch(err => renderNews({ success: false, error: err.message }));
+}, 30 * 60 * 1000);
+</script>
+</body>
+</html>
