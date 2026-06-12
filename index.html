@@ -352,22 +352,87 @@ function guessType(t) {
 
 function parseItems(html) {
   const doc = new DOMParser().parseFromString(html, 'text/html');
+  const items = [];
+  const seen = new Set();
+  
+  // Find all news article containers (more specific selector)
+  const articles = doc.querySelectorAll('.news-item, .article-item, [class*="news"], [class*="article"]');
+  
+  articles.forEach(article => {
+    // Try to find the main title link
+    const titleLink = article.querySelector('h3 a, h2 a, .title a, a[href*="/news/"]');
+    
+    if (!titleLink) return;
+    
+    const title = titleLink.textContent.trim();
+    
+    // Skip if no title or too short
+    if (!title || title.length < 10) return;
+    
+    // Skip if it's just a date
+    if (/^\d{4}-\d{2}-\d{2}/.test(title)) return;
+    
+    // Skip duplicates
+    if (seen.has(title)) return;
+    seen.add(title);
+    
+    // Extract date - look in multiple places
+    let dateText = '';
+    const dateEl = article.querySelector('.date, .post-date, time, [class*="date"]');
+    if (dateEl) {
+      dateText = dateEl.textContent.trim();
+    } else {
+      // Try to find date in surrounding text
+      const dateMatch = article.textContent.match(/(\d{4}-\d{2}-\d{2}(?:,\s*\w+)?)/);
+      if (dateMatch) dateText = dateMatch[1];
+    }
+    
+    // Determine type
+    const type = guessType(title);
+    
+    items.push({ title, date: dateText, type });
+  });
+  
+  // If the specific selector didn't work, fall back to anchor-based parsing
+  if (items.length < 3) {
+    return parseItemsFallback(doc);
+  }
+  
+  return items.length >= 3 ? items : null;
+}
+
+function parseItemsFallback(doc) {
   const anchors = doc.querySelectorAll('a[href*="/news-app/"]');
-  const items = [], seen = new Set();
+  const items = [];
+  const seen = new Set();
+  
   anchors.forEach(a => {
     const title = a.textContent.trim();
-    if (!title || title.length < 6 || seen.has(title)) return;
+    
+    // Skip invalid titles
+    if (!title || title.length < 10) return;
+    if (/^\d{4}-\d{2}-\d{2}/.test(title)) return; // Skip date-only
+    if (title.toLowerCase().includes('more')) return; // Skip "more" links
+    if (title.toLowerCase().includes('read more')) return;
+    
+    if (seen.has(title)) return;
     seen.add(title);
+    
     let dateText = '';
     let el = a.parentElement;
     for (let i = 0; i < 6; i++) {
       if (!el) break;
       const m = el.textContent.match(/(\d{4}-\d{2}-\d{2}(?:,\s*\w+)?)/);
-      if (m) { dateText = m[1]; break; }
+      if (m) { 
+        dateText = m[1]; 
+        break; 
+      }
       el = el.parentElement;
     }
+    
     items.push({ title, date: dateText, type: guessType(title) });
   });
+  
   return items.length >= 3 ? items : null;
 }
 
