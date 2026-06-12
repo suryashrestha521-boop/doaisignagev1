@@ -1,427 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KU Department of AI - News & Announcements</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    background: linear-gradient(135deg, #1B42B8 0%, #0097A7 100%);
-    font-family: 'Segoe UI', Arial, sans-serif;
-    padding: 1.5vh;
-  }
-  .main-container {
-    width: 100%;
-    height: 100%;
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 10px 50px rgba(0,0,0,0.3);
-  }
-  .top-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 2vh 3vh;
-    border-bottom: 2px solid #f0f0f0;
-    flex-shrink: 0;
-  }
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 2vh;
-  }
-  .ku-logo {
-    width: 8vh;
-    height: 8vh;
-    border-radius: 50%;
-    border: 3px solid #8B1A2A;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fff;
-    flex-shrink: 0;
-  }
-  .ku-logo img {
-    width: 7vh;
-    height: 7vh;
-    object-fit: contain;
-  }
-  .dept-title h1 {
-    font-size: 3.2vh;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 0.5vh;
-  }
-  .dept-title p {
-    font-size: 1.8vh;
-    color: #666;
-  }
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 2vh;
-    font-size: 1.6vh;
-  }
-  .cached-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.8vh;
-    color: #666;
-    padding: 0.8vh 1.5vh;
-    border-right: 2px solid #ddd;
-    padding-right: 2.5vh;
-  }
-  .cached-dot {
-    width: 1.2vh;
-    height: 1.2vh;
-    background: #FFB800;
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-  .updated-time {
-    font-weight: 600;
-    color: #333;
-  }
-  .blue-banner {
-    background: linear-gradient(135deg, #1B42B8 0%, #2563EB 100%);
-    padding: 3vh 3.5vh;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
-  .banner-title h2 {
-    font-size: 4vh;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 1vh;
-  }
-  .banner-title h3 {
-    font-size: 4.8vh;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: -0.5px;
-  }
-  .banner-link {
-    background: linear-gradient(135deg, #0097A7 0%, #00BCD4 100%);
-    color: #fff;
-    padding: 1.5vh 3.5vh;
-    border-radius: 8px;
-    font-size: 2.2vh;
-    font-weight: 700;
-    text-decoration: none;
-    box-shadow: 0 4px 15px rgba(0,151,167,0.3);
-  }
-  .content-area {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-    padding: 3vh;
-    gap: 3vh;
-  }
-  .featured-section {
-    flex: 1.2;
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 2px solid #e2e8f0;
-    display: flex;
-    flex-direction: column;
-  }
-  .featured-image-wrapper {
-    width: 100%;
-    height: 45vh;
-    overflow: hidden;
-    background: #f1f5f9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .featured-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background: #fff;
-  }
-  .featured-image-placeholder {
-    font-size: 12vh;
-    color: #cbd5e1;
-  }
-  .featured-content {
-    padding: 3vh;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  .news-badge {
-    display: inline-block;
-    background: #1B42B8;
-    color: #fff;
-    padding: 0.8vh 2vh;
-    border-radius: 6px;
-    font-size: 1.5vh;
-    font-weight: 700;
-    margin-bottom: 2vh;
-    text-transform: uppercase;
-    width: fit-content;
-  }
-  .featured-title {
-    font-size: 3.2vh;
-    font-weight: 700;
-    color: #1B42B8;
-    margin-bottom: 2vh;
-    line-height: 1.3;
-  }
-  .featured-description {
-    font-size: 1.7vh;
-    line-height: 1.8;
-    color: #475569;
-    text-align: justify;
-    margin-bottom: 2vh;
-    flex: 1;
-    overflow: hidden;
-  }
-  .publish-date {
-    font-size: 1.5vh;
-    font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
-    margin-bottom: 0.5vh;
-  }
-  .publish-date span {
-    font-weight: 700;
-    color: #1B42B8;
-    font-size: 1.7vh;
-  }
-  .news-list-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: #f8fafc;
-    border-radius: 12px;
-    border: 2px solid #e2e8f0;
-  }
-  .news-list-container {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-    padding: 2vh;
-  }
-  .news-list-track {
-    position: absolute;
-    top: 2vh;
-    left: 2vh;
-    right: 2vh;
-    will-change: transform;
-  }
-  .news-card {
-    display: flex;
-    gap: 2vh;
-    padding: 2vh;
-    background: #fff;
-    border-radius: 8px;
-    margin-bottom: 2vh;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  }
-  .news-thumbnail {
-    width: 10vh;
-    height: 10vh;
-    flex-shrink: 0;
-    border-radius: 6px;
-    overflow: hidden;
-    background: #f1f5f9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #e2e8f0;
-  }
-  .news-thumbnail img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background: #fff;
-  }
-  .news-thumbnail-placeholder {
-    font-size: 4vh;
-    color: #cbd5e1;
-  }
-  .news-card-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-width: 0;
-  }
-  .news-card-title {
-    font-size: 1.9vh;
-    font-weight: 700;
-    color: #1B42B8;
-    margin-bottom: 1vh;
-    line-height: 1.3;
-  }
-  .news-card-desc {
-    font-size: 1.4vh;
-    color: #64748b;
-    line-height: 1.5;
-    margin-bottom: 1vh;
-  }
-  .news-card-date {
-    font-size: 1.3vh;
-    font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
-  }
-  .news-card-date span {
-    font-weight: 700;
-    color: #1B42B8;
-  }
-  .carousel-dots {
-    display: flex;
-    justify-content: center;
-    gap: 1vh;
-    padding: 2.5vh;
-    background: #f8fafc;
-    border-top: 2px solid #e2e8f0;
-    flex-shrink: 0;
-  }
-  .dot {
-    width: 1.2vh;
-    height: 1.2vh;
-    border-radius: 50%;
-    background: #cbd5e1;
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-  .dot.active {
-    width: 4vh;
-    border-radius: 5px;
-    background: #1B42B8;
-  }
-  .ticker-bar {
-    background: #1B42B8;
-    height: 5vh;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-  .ticker-label {
-    background: #1230A0;
-    padding: 0 2.5vh;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    font-size: 1.4vh;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .ticker-track {
-    overflow: hidden;
-    flex: 1;
-    height: 100%;
-    position: relative;
-  }
-  .ticker-inner {
-    display: inline-flex;
-    align-items: center;
-    height: 100%;
-    white-space: nowrap;
-    will-change: transform;
-  }
-  .ticker-item {
-    font-size: 1.5vh;
-    color: rgba(255,255,255,0.9);
-    padding: 0 5vh;
-  }
-  .ticker-item::before {
-    content: "◆ ";
-    font-size: 1vh;
-    opacity: 0.6;
-    margin-right: 1vh;
-  }
-  .status-msg {
-    padding: 6vh;
-    font-size: 2.2vh;
-    color: #94a3b8;
-    text-align: center;
-  }
-  .error-msg {
-    color: #ef4444;
-    font-weight: 600;
-  }
-</style>
-</head>
-<body>
-<div class="main-container">
-  <div class="top-header">
-    <div class="header-left">
-      <div class="ku-logo">
-        <img id="ku-img" src="https://ku.edu.np/public/uploads/1643958563ku-logo.png" onerror="this.style.display='none'; document.getElementById('ku-txt').style.display='block';" alt="KU">
-        <div class="ku-logo-txt" id="ku-txt" style="display:none; font-weight:800; color:#8B1A2A; font-size:2.5vh;">KU</div>
-      </div>
-      <div class="dept-title">
-        <h1>Department of Artificial Intelligence</h1>
-        <p>School of Engineering, KU</p>
-      </div>
-    </div>
-    <div class="header-right">
-      <div class="cached-badge">
-        <div class="cached-dot"></div>
-        <span>Cached</span>
-      </div>
-      <div class="updated-time" id="updated-time">Updated --</div>
-    </div>
-  </div>
-  <div class="blue-banner">
-    <div class="banner-title">
-      <h2>KU Department of AI</h2>
-      <h3>News & Announcements</h3>
-    </div>
-    <div class="banner-link">ku.edu.np/news-app</div>
-  </div>
-  <div class="content-area">
-    <div class="featured-section">
-      <div id="featured-content">
-        <div class="status-msg">Loading news...</div>
-      </div>
-      <div class="carousel-dots" id="carousel-dots" style="display: none;"></div>
-    </div>
-    <div class="news-list-section">
-      <div class="news-list-container">
-        <div class="news-list-track" id="news-list-track"></div>
-      </div>
-    </div>
-  </div>
-  <div class="ticker-bar">
-    <div class="ticker-label">KU Department of AI</div>
-    <div class="ticker-track">
-      <div class="ticker-inner" id="ticker-inner">
-        <span class="ticker-item">Department of Artificial Intelligence — Kathmandu University</span>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
 function updateTime() {
   const n = new Date();
@@ -439,52 +15,42 @@ function guessType(t) {
   return 'news';
 }
 
-// ENHANCED IMAGE EXTRACTION WITH DEBUGGING
-function extractImage(article, baseUrl) {
-  console.log('Extracting image from article...');
+// BETTER IMAGE EXTRACTION - Find image CLOSEST to the news item
+function extractImageForItem(articleElement, baseUrl) {
+  console.log('Extracting image for article...');
   
-  // Strategy 1: Direct img tags
-  const imgs = article.getElementsByTagName('img');
-  console.log('Found', imgs.length, 'img tags');
-  
-  for (let i = 0; i < imgs.length; i++) {
-    const img = imgs[i];
-    let src = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || img.getAttribute('data-original');
-    
+  // Strategy 1: Look for img INSIDE this specific article only
+  const imgs = articleElement.querySelectorAll('img');
+  for (let img of imgs) {
+    let src = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src');
     if (src && src.trim()) {
       src = src.trim();
-      console.log('Raw image src:', src);
+      // Skip logos and common images
+      if (src.includes('logo') || src.includes('icon') || src.includes('ku-logo')) continue;
       
-      // Convert relative to absolute URL
-      if (src.startsWith('/')) {
-        src = baseUrl + src;
-      } else if (src.startsWith('./')) {
-        src = baseUrl + src.substring(1);
-      } else if (!src.startsWith('http') && !src.startsWith('data:')) {
-        src = baseUrl + '/' + src;
-      }
+      if (src.startsWith('/')) src = baseUrl + src;
+      else if (src.startsWith('./')) src = baseUrl + src.substring(1);
+      else if (!src.startsWith('http') && !src.startsWith('data:')) src = baseUrl + '/' + src;
       
-      console.log('✓ Found image:', src);
+      console.log('✓ Found article image:', src);
       return src;
     }
   }
   
-  // Strategy 2: Look for image links
-  const imgLinks = article.querySelectorAll('a[href$=".jpg"], a[href$=".jpeg"], a[href$=".png"], a[href$=".gif"], a[href$=".webp"]');
-  for (let link of imgLinks) {
-    let href = link.getAttribute('href');
-    if (href) {
-      if (href.startsWith('/')) {
-        href = baseUrl + href;
-      } else if (!href.startsWith('http')) {
-        href = baseUrl + '/' + href;
+  // Strategy 2: Look for image in a sibling or nearby element
+  const parent = articleElement.parentElement;
+  if (parent) {
+    const nearbyImgs = parent.querySelectorAll('img');
+    for (let img of nearbyImgs) {
+      let src = img.src;
+      if (src && !src.includes('logo') && !src.includes('icon')) {
+        console.log('✓ Found nearby image:', src);
+        return src;
       }
-      console.log('✓ Found image link:', href);
-      return href;
     }
   }
   
-  console.log('✗ No image found');
+  console.log('✗ No unique image found for this article');
   return null;
 }
 
@@ -493,51 +59,138 @@ function parseItems(html, baseUrl = 'https://ku.edu.np') {
   const items = [];
   const seen = new Set();
   
-  console.log('=== PARSING HTML ===');
-  console.log('HTML length:', html.length);
+  console.log('=== PARSING NEWS ITEMS ===');
   
-  // Find all links that might be news items
-  const allLinks = doc.querySelectorAll('a[href*="/news/"], a[href*="news-app"]');
-  console.log('Found', allLinks.length, 'news links');
+  // Find all news article containers - be more specific
+  const articleSelectors = [
+    '.news-item',
+    '.article-item', 
+    '.post',
+    '.entry',
+    '[class*="news-card"]',
+    '[class*="article-card"]'
+  ];
   
-  allLinks.forEach((link, index) => {
-    const title = link.textContent.trim();
+  let articles = [];
+  for (let selector of articleSelectors) {
+    const found = doc.querySelectorAll(selector);
+    if (found.length > 0) {
+      articles = Array.from(found);
+      console.log(`Found ${articles.length} articles using selector: ${selector}`);
+      break;
+    }
+  }
+  
+  // If no specific containers found, try to find by structure
+  if (articles.length === 0) {
+    console.log('Trying fallback parsing method...');
+    return parseItemsFallback(doc, html, baseUrl);
+  }
+  
+  articles.forEach((article, index) => {
+    console.log(`\n--- Processing article ${index + 1} ---`);
     
-    // Skip invalid titles
+    // Find title link within this article
+    const titleLink = article.querySelector('h3 a, h2 a, h4 a, .title a, a[href*="/news/"]');
+    if (!titleLink) {
+      console.log('✗ No title link found');
+      return;
+    }
+    
+    const title = titleLink.textContent.trim();
     if (!title || title.length < 10) return;
     if (/^\d{4}-\d{2}-\d{2}/.test(title)) return;
     if (title.toLowerCase().includes('more')) return;
     if (seen.has(title)) return;
     seen.add(title);
     
-    console.log(`\n--- Processing item ${index + 1} ---`);
     console.log('Title:', title.substring(0, 60));
     
-    // Find parent container (go up the DOM tree)
-    let parent = link.parentElement;
-    for (let i = 0; i < 5 && parent; i++) {
-      parent = parent.parentElement;
-    }
-    if (!parent) parent = link.parentElement;
-    
-    // Extract date
+    // Extract date from THIS article only
     let dateText = '';
-    const dateMatch = parent.textContent.match(/(\d{4}-\d{2}-\d{2}(?:,\s*\w+)?)/);
-    if (dateMatch) {
-      dateText = dateMatch[1];
-      console.log('Date:', dateText);
+    const dateElements = article.querySelectorAll('.date, .post-date, time, [class*="date"], .publish-date');
+    for (let el of dateElements) {
+      const text = el.textContent.trim();
+      const dateMatch = text.match(/(\d{4}-\d{2}-\d{2}(?:,\s*\w+)?)/);
+      if (dateMatch) {
+        dateText = dateMatch[1];
+        break;
+      }
     }
+    if (!dateText) {
+      const dateMatch = article.textContent.match(/(\d{4}-\d{2}-\d{2}(?:,\s*\w+)?)/);
+      if (dateMatch) dateText = dateMatch[1];
+    }
+    console.log('Date:', dateText);
     
-    // Extract description
+    // Extract description from THIS article
     let desc = '';
-    const paragraphs = parent.querySelectorAll('p');
-    if (paragraphs.length > 0) {
-      desc = paragraphs[0].textContent.trim();
+    const descEl = article.querySelector('p, .description, .excerpt, .summary');
+    if (descEl) {
+      desc = descEl.textContent.trim();
       if (desc.length > 200) desc = desc.substring(0, 200) + '...';
     }
     
-    // Extract image
-    const image = extractImage(parent, baseUrl);
+    // Extract image SPECIFIC to this article
+    const image = extractImageForItem(article, baseUrl);
+    
+    items.push({
+      title,
+      date: dateText,
+      type: guessType(title),
+      description: desc,
+      fullContent: article.textContent.trim(),
+      image: image
+    });
+    
+    console.log('Image:', image ? 'FOUND ✓' : 'NOT FOUND ✗');
+  });
+  
+  console.log('\n=== PARSING COMPLETE ===');
+  console.log('Total items parsed:', items.length);
+  items.forEach((item, i) => {
+    console.log(`${i + 1}. ${item.title.substring(0, 40)}... | Image: ${item.image ? 'YES' : 'NO'}`);
+  });
+  
+  return items.length >= 3 ? items : null;
+}
+
+function parseItemsFallback(doc, html, baseUrl) {
+  console.log('Using fallback parsing...');
+  const items = [];
+  const seen = new Set();
+  
+  // Find all news links
+  const links = doc.querySelectorAll('a[href*="/news/"], a[href*="news-app"]');
+  
+  links.forEach((link, index) => {
+    const title = link.textContent.trim();
+    if (!title || title.length < 10) return;
+    if (/^\d{4}-\d{2}-\d{2}/.test(title)) return;
+    if (title.toLowerCase().includes('more')) return;
+    if (seen.has(title)) return;
+    seen.add(title);
+    
+    // Find closest parent that looks like a news container
+    let parent = link;
+    for (let i = 0; i < 6 && parent; i++) {
+      if (parent.className && (parent.className.includes('news') || parent.className.includes('article') || parent.className.includes('card'))) {
+        break;
+      }
+      parent = parent.parentElement;
+    }
+    
+    let dateText = '';
+    const dateMatch = parent.textContent.match(/(\d{4}-\d{2}-\d{2}(?:,\s*\w+)?)/);
+    if (dateMatch) dateText = dateMatch[1];
+    
+    let desc = '';
+    const paragraphs = parent.querySelectorAll('p');
+    if (paragraphs.length > 0) {
+      desc = paragraphs[0].textContent.trim().substring(0, 200) + '...';
+    }
+    
+    const image = extractImageForItem(parent, baseUrl);
     
     items.push({
       title,
@@ -549,12 +202,6 @@ function parseItems(html, baseUrl = 'https://ku.edu.np') {
     });
     
     if (items.length >= 10) return;
-  });
-  
-  console.log('\n=== PARSING COMPLETE ===');
-  console.log('Total items:', items.length);
-  items.forEach((item, i) => {
-    console.log(`Item ${i + 1}: ${item.title.substring(0, 40)}... | Image: ${item.image ? 'YES' : 'NO'}`);
   });
   
   return items.length >= 3 ? items : null;
@@ -577,9 +224,7 @@ async function loadNews() {
   if (!res.ok) throw new Error('Server returned HTTP ' + res.status);
   
   const html = await res.text();
-  console.log('=== FETCHED HTML ===');
-  console.log('Length:', html.length);
-  console.log('First 500 chars:', html.substring(0, 500));
+  console.log('Fetched HTML length:', html.length);
   
   const items = parseItems(html, 'https://ku.edu.np');
   
@@ -607,16 +252,21 @@ function renderNews(result) {
   }
 
   const items = result.items;
-  console.log('=== RENDERING', items.length, 'ITEMS ===');
+  console.log('\n=== RENDERING', items.length, 'NEWS ITEMS ===');
   
-  // Render featured
+  // Render featured slides
   featuredContent.innerHTML = items.map((item, idx) => {
-    console.log(`Rendering featured item ${idx}:`, item.title.substring(0, 40), 'Image:', item.image);
+    console.log(`\nFeatured Item ${idx + 1}:`);
+    console.log('  Title:', item.title.substring(0, 50));
+    console.log('  Image URL:', item.image || 'NONE');
+    
     return `
       <div class="featured-slide" style="display: ${idx === 0 ? 'block' : 'none'}">
         <div class="featured-image-wrapper">
           ${item.image 
-            ? `<img src="${item.image}" class="featured-image" onerror="console.error('IMAGE FAILED TO LOAD:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';" alt="${item.title}">`
+            ? `<img src="${item.image}" class="featured-image" 
+                onerror="console.error('❌ FEATURED IMAGE FAILED:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                alt="${item.title}" crossorigin="anonymous">`
             : ''
           }
           <div class="featured-image-placeholder" style="${item.image ? 'display:none;' : 'display:flex;'}">📄</div>
@@ -631,7 +281,7 @@ function renderNews(result) {
     `;
   }).join('');
 
-  // Render dots
+  // Render carousel dots
   if (items.length > 1) {
     dotsContainer.style.display = 'flex';
     dotsContainer.innerHTML = items.map((_, idx) => 
@@ -641,26 +291,35 @@ function renderNews(result) {
     dotsContainer.style.display = 'none';
   }
 
-  // Render scrolling list
+  // Render scrolling list with UNIQUE images for each item
   const duplicatedItems = [...items, ...items];
-  listTrack.innerHTML = duplicatedItems.map(item => `
-    <div class="news-card">
-      <div class="news-thumbnail">
-        ${item.image 
-          ? `<img src="${item.image}" onerror="console.error('THUMBNAIL FAILED:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';" alt="${item.title}">`
-          : ''
-        }
-        <div class="news-thumbnail-placeholder" style="${item.image ? 'display:none;' : 'display:flex;'}">📄</div>
-      </div>
-      <div class="news-card-content">
-        <div>
-          <div class="news-card-title">${item.title}</div>
-          <div class="news-card-desc">${item.description || item.title.substring(0, 120) + '...'}</div>
+  listTrack.innerHTML = duplicatedItems.map((item, idx) => {
+    const originalIdx = idx % items.length;
+    console.log(`\nList Item ${idx + 1} (original ${originalIdx + 1}):`);
+    console.log('  Title:', item.title.substring(0, 50));
+    console.log('  Image URL:', item.image || 'NONE');
+    
+    return `
+      <div class="news-card">
+        <div class="news-thumbnail">
+          ${item.image 
+            ? `<img src="${item.image}" 
+                onerror="console.error('❌ THUMBNAIL IMAGE FAILED:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                alt="${item.title}" crossorigin="anonymous">`
+            : ''
+          }
+          <div class="news-thumbnail-placeholder" style="${item.image ? 'display:none;' : 'display:flex;'}">📄</div>
         </div>
-        <div class="news-card-date">Publish Date <span>${item.date || 'N/A'}</span></div>
+        <div class="news-card-content">
+          <div>
+            <div class="news-card-title">${item.title}</div>
+            <div class="news-card-desc">${item.description || item.title.substring(0, 120) + '...'}</div>
+          </div>
+          <div class="news-card-date">Publish Date <span>${item.date || 'N/A'}</span></div>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   // Update ticker
   tickerInner.innerHTML = items.map(i => 
@@ -727,10 +386,10 @@ function startScrollingQueue() {
 }
 
 // Initialize
-console.log('=== INITIALIZING ===');
+console.log('=== INITIALIZING NEWS SIGNAGE ===');
 loadNews()
   .then(data => {
-    console.log('=== SUCCESS ===');
+    console.log('=== SUCCESS: Loading news ===');
     renderNews({ success: true, items: data.items, html: data.html });
   })
   .catch(err => {
@@ -745,5 +404,3 @@ setInterval(() => {
     .catch(err => renderNews({ success: false, error: err.message }));
 }, 30 * 60 * 1000);
 </script>
-</body>
-</html>
