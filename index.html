@@ -3,321 +3,354 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1920, height=1080">
-<title>DoAI – News & Announcements</title>
+<title>KU Department of AI - News & Announcements</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body {
+  body {
     width: 1920px;
     height: 1080px;
     overflow: hidden;
-    background: #1B42B8;
+    background: linear-gradient(135deg, #1B42B8 0%, #0097A7 100%);
     font-family: 'Segoe UI', Arial, sans-serif;
+    padding: 20px;
   }
 
-  /* OUTER FRAME */
-  .frame {
-    width: 1920px;
-    height: 1080px;
-    background: #1B42B8;
-    padding: 28px 32px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* WHITE CARD */
-  .card {
-    flex: 1;
-    background: #ffffff;
-    border-radius: 18px;
+  /* MAIN CONTAINER */
+  .main-container {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 12px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.28);
+    box-shadow: 0 10px 50px rgba(0,0,0,0.3);
   }
 
-  /* TOP HEADER ROW */
-  .card-header {
+  /* TOP HEADER */
+  .top-header {
     display: flex;
     align-items: center;
-    padding: 16px 40px;
-    border-bottom: 1.5px solid #e8e8e8;
-    flex-shrink: 0;
-    background: #fff;
-    gap: 22px;
+    justify-content: space-between;
+    padding: 20px 30px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
   }
 
   .ku-logo {
-    width: 72px;
-    height: 72px;
-    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
+    border: 3px solid #8B1A2A;
     overflow: hidden;
-    border: 2.5px solid #8B1A2A;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #fff;
   }
+
   .ku-logo img {
-    width: 68px;
-    height: 68px;
+    width: 54px;
+    height: 54px;
     object-fit: contain;
   }
-  .ku-logo-txt {
-    font-size: 18px;
-    font-weight: 800;
-    color: #8B1A2A;
-    text-align: center;
-    line-height: 1;
-  }
-  .ku-logo-txt small { display: block; font-size: 9px; font-weight: 600; letter-spacing: 1.5px; margin-top: 2px; }
 
-  .dept-info { flex: 1; }
-  .dept-info h1 { font-size: 25px; font-weight: 700; color: #1a1a1a; line-height: 1.2; }
-  .dept-info p  { font-size: 16px; color: #555; margin-top: 3px; }
-
-  .header-stats { display: flex; align-items: center; flex-shrink: 0; }
-
-  .stat-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 0 30px;
-    border-left: 1.5px solid #ddd;
-  }
-  .stat-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: #1B42B8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .stat-icon svg { width: 26px; height: 26px; fill: #fff; }
-  .stat-text strong { display: block; font-size: 19px; font-weight: 700; color: #1a1a1a; line-height: 1.1; }
-  .stat-text span   { font-size: 12px; color: #666; }
-
-  /* TEAL BANNER */
-  .section-banner {
-    background: linear-gradient(135deg, #0097A7 0%, #00BCD4 45%, #1B42B8 100%);
-    height: 64px;
-    display: flex;
-    align-items: center;
-    padding: 0 40px;
-    flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
-    gap: 16px;
-  }
-  .section-banner::after {
-    content: '';
-    position: absolute;
-    right: 60px;
-    top: -10px;
-    width: 180px;
-    height: 90px;
-    background: rgba(255,255,255,0.07);
-    transform: skewX(-18deg);
-    border-radius: 4px;
-  }
-  .section-banner h2 {
-    font-size: 24px;
+  .dept-title h1 {
+    font-size: 28px;
     font-weight: 700;
-    color: #fff;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
+    color: #1a1a1a;
+    margin-bottom: 4px;
   }
-  .live-badge {
-    background: rgba(255,255,255,0.18);
-    border: 1px solid rgba(255,255,255,0.4);
-    border-radius: 20px;
-    padding: 3px 12px;
-    font-size: 12px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 1px;
+
+  .dept-title p {
+    font-size: 16px;
+    color: #666;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 14px;
+  }
+
+  .cached-badge {
     display: flex;
     align-items: center;
     gap: 6px;
-  }
-  .live-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #00FF87;
-    animation: blink 1.4s ease-in-out infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  .banner-right {
-    margin-left: auto;
-    font-size: 14px;
-    color: rgba(255,255,255,0.72);
-    letter-spacing: 1px;
+    color: #666;
+    padding: 6px 12px;
+    border-right: 2px solid #ddd;
+    padding-right: 20px;
   }
 
-  /* 🎠 CAROUSEL NEWS AREA */
-  .news-area {
+  .cached-dot {
+    width: 10px;
+    height: 10px;
+    background: #FFB800;
+    border-radius: 50%;
+  }
+
+  .updated-time {
+    font-weight: 600;
+    color: #333;
+  }
+
+  /* BLUE BANNER */
+  .blue-banner {
+    background: linear-gradient(135deg, #1B42B8 0%, #2563EB 100%);
+    padding: 25px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .banner-title h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .banner-title h3 {
+    font-size: 42px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+
+  .banner-link {
+    background: linear-gradient(135deg, #0097A7 0%, #00BCD4 100%);
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0,151,167,0.3);
+  }
+
+  /* CONTENT AREA */
+  .content-area {
     flex: 1;
+    display: flex;
+    overflow: hidden;
+    padding: 25px;
+    gap: 25px;
+  }
+
+  /* LEFT - FEATURED NEWS */
+  .featured-section {
+    flex: 1.2;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 30px;
     overflow: hidden;
     position: relative;
-    background: #fff;
+    border: 2px solid #e2e8f0;
+  }
+
+  .news-badge {
+    display: inline-block;
+    background: #1B42B8;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+  }
+
+  .featured-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1B42B8;
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+
+  .featured-description {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #475569;
+    text-align: justify;
+    margin-bottom: 25px;
+  }
+
+  .publish-date {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .publish-date span {
+    font-weight: 600;
+    color: #1B42B8;
+    font-size: 16px;
+  }
+
+  /* RIGHT - NEWS LIST */
+  .news-list-section {
+    flex: 0.9;
     display: flex;
     flex-direction: column;
-  }
-
-  .carousel-container {
-    flex: 1;
-    position: relative;
+    gap: 12px;
     overflow: hidden;
-    padding: 0 40px;
   }
 
-  .carousel-slide {
+  .news-list-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .news-list-track {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    padding: 20px 0;
-    opacity: 0;
-    transform: translateX(100px);
-    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none;
+    will-change: transform;
   }
 
-  .carousel-slide.active {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
+  .news-card {
+    display: flex;
+    gap: 15px;
+    padding: 18px;
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
   }
 
-  .carousel-slide.exit-left {
-    opacity: 0;
-    transform: translateX(-100px);
+  .news-card:nth-child(odd) {
+    background: #f1f5f9;
   }
 
-  .news-item {
+  .news-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .news-thumbnail {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #e2e8f0;
     display: flex;
     align-items: center;
-    gap: 20px;
-    padding: 18px 0;
-    border-bottom: 1px solid #F2F2F2;
-    animation: fadeSlideIn 0.5s ease-out backwards;
+    justify-content: center;
   }
 
-  .news-item:nth-child(1) { animation-delay: 0.1s; }
-  .news-item:nth-child(2) { animation-delay: 0.2s; }
-  .news-item:nth-child(3) { animation-delay: 0.3s; }
-  .news-item:nth-child(4) { animation-delay: 0.4s; }
-
-  @keyframes fadeSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .news-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  .item-num {
-    flex-shrink: 0;
+  .news-thumbnail-placeholder {
     font-size: 30px;
-    font-weight: 800;
-    color: #EBEBEB;
-    min-width: 46px;
-    text-align: right;
-    line-height: 1;
+    color: #94a3b8;
   }
 
-  .news-badge {
-    flex-shrink: 0;
-    border-radius: 5px;
-    padding: 6px 14px;
+  .news-card-content {
+    flex: 1;
+  }
+
+  .news-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1B42B8;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .news-card-desc {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .news-card-date {
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: 1px;
+    color: #475569;
     text-transform: uppercase;
-    min-width: 80px;
-    text-align: center;
   }
-  .badge-notice { background: #EEF2FF; color: #3730A3; border: 1.5px solid #C7D2FE; }
-  .badge-news   { background: #ECFDF5; color: #065F46; border: 1.5px solid #6EE7B7; }
-  .badge-event  { background: #FFF7ED; color: #92400E; border: 1.5px solid #FCD34D; }
 
-  .news-content { flex: 1; }
-  .news-title { font-size: 21px; font-weight: 600; color: #1a1a1a; line-height: 1.35; }
-  .news-date  { font-size: 13px; color: #999; margin-top: 5px; }
+  .news-card-date span {
+    font-weight: 600;
+    color: #1B42B8;
+  }
 
-  /* 🎠 CAROUSEL INDICATORS */
-  .carousel-indicators {
+  /* CAROUSEL DOTS */
+  .carousel-dots {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    padding: 16px 0;
-    flex-shrink: 0;
+    gap: 8px;
+    padding: 20px;
+    background: #f8fafc;
+    border-top: 2px solid #e2e8f0;
   }
 
-  .carousel-dot {
+  .dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #ddd;
+    background: #cbd5e1;
     transition: all 0.3s ease;
     cursor: pointer;
   }
 
-  .carousel-dot.active {
-    width: 32px;
+  .dot.active {
+    width: 30px;
     border-radius: 5px;
-    background: linear-gradient(90deg, #0097A7, #1B42B8);
-  }
-
-  /* 🎠 PROGRESS BAR */
-  .carousel-progress {
-    height: 3px;
-    background: #f0f0f0;
-    flex-shrink: 0;
-    overflow: hidden;
-  }
-
-  .carousel-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #0097A7, #1B42B8);
-    width: 0%;
-    transition: width 0.1s linear;
+    background: #1B42B8;
   }
 
   /* TICKER */
   .ticker-bar {
     background: #1B42B8;
-    height: 46px;
+    height: 40px;
     display: flex;
     align-items: center;
     overflow: hidden;
-    flex-shrink: 0;
   }
+
   .ticker-label {
     background: #1230A0;
-    padding: 0 24px;
+    padding: 0 20px;
     height: 100%;
     display: flex;
     align-items: center;
-    gap: 8px;
     font-size: 12px;
     font-weight: 700;
     color: #fff;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     text-transform: uppercase;
     white-space: nowrap;
     flex-shrink: 0;
   }
-  .ticker-label svg { width: 15px; height: 15px; fill: rgba(255,255,255,0.8); }
-  .ticker-track { overflow: hidden; flex: 1; height: 100%; position: relative; }
+
+  .ticker-track {
+    overflow: hidden;
+    flex: 1;
+    height: 100%;
+    position: relative;
+  }
+
   .ticker-inner {
     display: inline-flex;
     align-items: center;
@@ -325,116 +358,121 @@
     white-space: nowrap;
     will-change: transform;
   }
-  .ticker-item { font-size: 14px; color: rgba(255,255,255,0.88); padding: 0 44px; }
-  .ticker-item::before { content: "◆  "; font-size: 8px; opacity: 0.55; }
 
-  .status-msg { padding: 50px 0; font-size: 20px; color: #bbb; text-align: center; }
+  .ticker-item {
+    font-size: 13px;
+    color: rgba(255,255,255,0.9);
+    padding: 0 40px;
+  }
+
+  .ticker-item::before {
+    content: "◆ ";
+    font-size: 8px;
+    opacity: 0.6;
+    margin-right: 8px;
+  }
+
+  /* LOADING & ERROR STATES */
+  .status-msg {
+    padding: 50px;
+    font-size: 18px;
+    color: #94a3b8;
+    text-align: center;
+  }
+
+  .error-msg {
+    color: #ef4444;
+    font-weight: 600;
+  }
 </style>
 </head>
 <body>
-<div class="frame">
-  <div class="card">
-
-    <!-- TOP HEADER -->
-    <div class="card-header">
+<div class="main-container">
+  
+  <!-- TOP HEADER -->
+  <div class="top-header">
+    <div class="header-left">
       <div class="ku-logo">
         <img id="ku-img"
              src="https://ku.edu.np/public/uploads/1643958563ku-logo.png"
              onerror="this.style.display='none'; document.getElementById('ku-txt').style.display='block';"
              alt="KU">
-        <div class="ku-logo-txt" id="ku-txt" style="display:none;">KU<small>NEPAL</small></div>
+        <div class="ku-logo-txt" id="ku-txt" style="display:none; font-weight:800; color:#8B1A2A; font-size:18px;">KU</div>
       </div>
-
-      <div class="dept-info">
+      <div class="dept-title">
         <h1>Department of Artificial Intelligence</h1>
         <p>School of Engineering, KU</p>
       </div>
-
-      <div class="header-stats">
-        <div class="stat-item">
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
-          </div>
-          <div class="stat-text">
-            <strong id="clock-val">--:--</strong>
-            <span id="date-val">Loading</span>
-          </div>
-        </div>
-
-        <div class="stat-item">
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-          </div>
-          <div class="stat-text">
-            <strong id="count-val">—</strong>
-            <span>Announcements</span>
-          </div>
-        </div>
-
-        <div class="stat-item">
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-          </div>
-          <div class="stat-text">
-            <strong>doai.ku.edu.np</strong>
-            <span>Official Website</span>
-          </div>
-        </div>
-      </div>
     </div>
-
-    <!-- TEAL SECTION BANNER -->
-    <div class="section-banner">
-      <h2>News &amp; Announcements</h2>
-      <div class="live-badge"><div class="live-dot"></div> LIVE</div>
-      <span class="banner-right" id="banner-count"></span>
+    <div class="header-right">
+      <div class="cached-badge">
+        <div class="cached-dot"></div>
+        <span>Cached</span>
+      </div>
+      <div class="updated-time" id="updated-time">Updated --</div>
     </div>
-
-    <!-- 🎠 CAROUSEL NEWS AREA -->
-    <div class="news-area">
-      <div class="carousel-container" id="carousel-container">
-        <!-- Slides will be injected here -->
-      </div>
-      <div class="carousel-indicators" id="carousel-indicators">
-        <!-- Dots will be injected here -->
-      </div>
-      <div class="carousel-progress">
-        <div class="carousel-progress-bar" id="carousel-progress-bar"></div>
-      </div>
-    </div>
-
-    <!-- TICKER -->
-    <div class="ticker-bar">
-      <div class="ticker-label">
-        <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
-        DoAI · KU
-      </div>
-      <div class="ticker-track">
-        <div class="ticker-inner" id="ticker-inner">
-          <span class="ticker-item">Department of Artificial Intelligence — Kathmandu University, Dhulikhel, Nepal</span>
-        </div>
-      </div>
-    </div>
-
   </div>
+
+  <!-- BLUE BANNER -->
+  <div class="blue-banner">
+    <div class="banner-title">
+      <h2>KU Department of AI</h2>
+      <h3>News & Announcements</h3>
+    </div>
+    <div class="banner-link">ku.edu.np/news-app</div>
+  </div>
+
+  <!-- CONTENT AREA -->
+  <div class="content-area">
+    <!-- LEFT - FEATURED NEWS -->
+    <div class="featured-section">
+      <div id="featured-content">
+        <div class="status-msg">Loading news...</div>
+      </div>
+    </div>
+
+    <!-- RIGHT - NEWS LIST -->
+    <div class="news-list-section">
+      <div class="news-list-container">
+        <div class="news-list-track" id="news-list-track">
+          <!-- News cards will be inserted here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAROUSEL DOTS -->
+  <div class="carousel-dots" id="carousel-dots">
+    <!-- Dots will be inserted here -->
+  </div>
+
+  <!-- TICKER -->
+  <div class="ticker-bar">
+    <div class="ticker-label">KU Department of AI</div>
+    <div class="ticker-track">
+      <div class="ticker-inner" id="ticker-inner">
+        <span class="ticker-item">Department of Artificial Intelligence — Kathmandu University</span>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
-/* CLOCK */
-function tick() {
+/* CLOCK & TIME */
+function updateTime() {
   const n = new Date();
-  document.getElementById('clock-val').textContent =
-    String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
-  const D = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('date-val').textContent =
-    D[n.getDay()] + ' ' + n.getDate() + ' ' + M[n.getMonth()] + ' ' + n.getFullYear();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const timeStr = `${n.getDate()} ${months[n.getMonth()]}, ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('updated-time').textContent = 'Updated ' + timeStr;
 }
-tick(); setInterval(tick, 1000);
+updateTime();
+setInterval(updateTime, 60000);
 
+/* DATA PARSING */
 function guessType(t) {
   const s = t.toLowerCase();
-  if (s.includes('workshop') || s.includes('fest') || s.includes('seminar') || (s.includes('orientation') && s.includes('program'))) return 'event';
+  if (s.includes('workshop') || s.includes('fest') || s.includes('seminar')) return 'event';
   if (s.includes('admission') || s.includes('selection') || s.includes('eoi') || s.includes('interview') || s.includes('notice') || s.includes('defence')) return 'notice';
   return 'news';
 }
@@ -448,11 +486,9 @@ function parseItems(html) {
   
   articles.forEach(article => {
     const titleLink = article.querySelector('h3 a, h2 a, .title a, a[href*="/news/"]');
-    
     if (!titleLink) return;
     
     const title = titleLink.textContent.trim();
-    
     if (!title || title.length < 10) return;
     if (/^\d{4}-\d{2}-\d{2}/.test(title)) return;
     if (seen.has(title)) return;
@@ -467,8 +503,18 @@ function parseItems(html) {
       if (dateMatch) dateText = dateMatch[1];
     }
     
-    const type = guessType(title);
-    items.push({ title, date: dateText, type });
+    // Extract description
+    let desc = '';
+    const descEl = article.querySelector('p, .description, .excerpt');
+    if (descEl) desc = descEl.textContent.trim().substring(0, 150) + '...';
+    
+    items.push({ 
+      title, 
+      date: dateText, 
+      type: guessType(title),
+      description: desc,
+      fullContent: article.textContent.trim()
+    });
   });
   
   if (items.length < 3) {
@@ -485,12 +531,9 @@ function parseItemsFallback(doc) {
   
   anchors.forEach(a => {
     const title = a.textContent.trim();
-    
     if (!title || title.length < 10) return;
     if (/^\d{4}-\d{2}-\d{2}/.test(title)) return;
     if (title.toLowerCase().includes('more')) return;
-    if (title.toLowerCase().includes('read more')) return;
-    
     if (seen.has(title)) return;
     seen.add(title);
     
@@ -499,24 +542,28 @@ function parseItemsFallback(doc) {
     for (let i = 0; i < 6; i++) {
       if (!el) break;
       const m = el.textContent.match(/(\d{4}-\d{2}-\d{2}(?:,\s*\w+)?)/);
-      if (m) { 
-        dateText = m[1]; 
-        break; 
-      }
+      if (m) { dateText = m[1]; break; }
       el = el.parentElement;
     }
     
-    items.push({ title, date: dateText, type: guessType(title) });
+    items.push({ 
+      title, 
+      date: dateText, 
+      type: guessType(title),
+      description: title.substring(0, 100) + '...',
+      fullContent: title
+    });
   });
   
   return items.length >= 3 ? items : null;
 }
 
+/* FETCH NEWS */
 const KU_NEWS = '/.netlify/functions/fetch-news';
 
 async function loadNews() {
   const timeoutPromise = new Promise((_, reject) => 
-    setTimeout(() => reject(new Error('Request timed out after 10 seconds')), 10000)
+    setTimeout(() => reject(new Error('Request timed out')), 10000)
   );
   
   let res;
@@ -538,179 +585,113 @@ async function loadNews() {
   return items;
 }
 
-function badgeCls(type) { return type === 'event' ? 'badge-event' : type === 'news' ? 'badge-news' : 'badge-notice'; }
-function badgeLbl(type) { return type === 'event' ? 'Event' : type === 'news' ? 'News' : 'Notice'; }
-
-// 🎠 CAROUSEL VARIABLES
-let carouselItems = [];
-let currentSlide = 0;
-let totalSlides = 0;
+/* RENDER FUNCTIONS */
+let featuredIndex = 0;
 let carouselInterval = null;
-let progressInterval = null;
-const ITEMS_PER_SLIDE = 4;
-const SLIDE_DURATION = 6000; // 6 seconds per slide
 
 function renderNews(result) {
-  const container = document.getElementById('carousel-container');
-  const indicators = document.getElementById('carousel-indicators');
+  const featuredContent = document.getElementById('featured-content');
+  const listTrack = document.getElementById('news-list-track');
+  const dotsContainer = document.getElementById('carousel-dots');
   const tickerInner = document.getElementById('ticker-inner');
 
   if (!result.success) {
-    document.getElementById('count-val').textContent = '0';
-    document.getElementById('banner-count').textContent = 'Error';
-    
-    container.innerHTML = `
-      <div class="carousel-slide active">
-        <div class="status-msg" style="color: #e53e3e; font-weight: 600; font-size: 22px; padding-top: 100px;">
-          ⚠️ Failed to fetch live data
-          <div style="font-size: 16px; color: #555; font-weight: 400; margin-top: 12px; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.5;">
-            Reason: <strong>${result.error}</strong><br>
-            <span style="font-size: 14px; color: #888; margin-top: 8px; display: block;">
-              Please check if Netlify Function is deployed correctly at: /.netlify/functions/fetch-news
-            </span>
-          </div>
-        </div>
-      </div>
-    `;
-    
-    tickerInner.innerHTML = `<span class="ticker-item" style="color:#ff6b6b; font-weight:bold;">⚠️ FETCH FAILED: ${result.error}</span>`;
-    startTicker();
+    featuredContent.innerHTML = `<div class="status-msg error-msg">⚠️ ${result.error}</div>`;
     return;
   }
 
   const items = result.items;
-  carouselItems = items;
-  document.getElementById('count-val').textContent = items.length;
-  document.getElementById('banner-count').textContent = items.length + ' items';
-
-  // Create slides (4 items per slide)
-  totalSlides = Math.ceil(items.length / ITEMS_PER_SLIDE);
-  container.innerHTML = '';
-  indicators.innerHTML = '';
-
-  for (let slideIdx = 0; slideIdx < totalSlides; slideIdx++) {
-    const slideItems = items.slice(slideIdx * ITEMS_PER_SLIDE, (slideIdx + 1) * ITEMS_PER_SLIDE);
-    
-    const slideDiv = document.createElement('div');
-    slideDiv.className = 'carousel-slide' + (slideIdx === 0 ? ' active' : '');
-    slideDiv.innerHTML = slideItems.map((item, i) => {
-      const globalIdx = slideIdx * ITEMS_PER_SLIDE + i;
-      return `
-        <div class="news-item">
-          <span class="item-num">${String(globalIdx + 1).padStart(2,'0')}</span>
-          <span class="news-badge ${badgeCls(item.type)}">${badgeLbl(item.type)}</span>
-          <div class="news-content">
-            <div class="news-title">${item.title}</div>
-            ${item.date ? '<div class="news-date">' + item.date + '</div>' : ''}
-          </div>
-        </div>
-      `;
-    }).join('');
-    
-    container.appendChild(slideDiv);
-
-    // Create indicator dot
-    const dot = document.createElement('div');
-    dot.className = 'carousel-dot' + (slideIdx === 0 ? ' active' : '');
-    dot.onclick = () => goToSlide(slideIdx);
-    indicators.appendChild(dot);
-  }
+  
+  // Render featured content (carousel)
+  renderFeaturedCarousel(items, featuredContent, dotsContainer);
+  
+  // Render list
+  listTrack.innerHTML = items.map(item => `
+    <div class="news-card">
+      <div class="news-thumbnail">
+        <div class="news-thumbnail-placeholder">📄</div>
+      </div>
+      <div class="news-card-content">
+        <div class="news-card-title">${item.title}</div>
+        <div class="news-card-desc">${item.description || item.title.substring(0, 120) + '...'}</div>
+        <div class="news-card-date">Publish Date <span>${item.date || 'N/A'}</span></div>
+      </div>
+    </div>
+  `).join('');
 
   // Update ticker
-  tickerInner.innerHTML = 
-    items.map(i => `<span class="ticker-item">${i.title}${i.date ? '  ·  ' + i.date : ''}</span>`).join('') +
-    '<span class="ticker-item">Department of Artificial Intelligence · Kathmandu University · doai.ku.edu.np · ai_office@ku.edu.np · +977-11-499429</span>';
+  tickerInner.innerHTML = items.map(i => 
+    `<span class="ticker-item">${i.title}</span>`
+  ).join('') + 
+  '<span class="ticker-item">Department of Artificial Intelligence · Kathmandu University · doai.ku.edu.np</span>';
 
-  startTicker();
-  startCarousel();
+  startListScroll();
+  startFeaturedCarousel(items.length);
 }
 
-// 🎠 CAROUSEL FUNCTIONS
+function renderFeaturedCarousel(items, container, dotsContainer) {
+  container.innerHTML = items.map((item, idx) => `
+    <div class="featured-slide" style="display: ${idx === 0 ? 'block' : 'none'}" data-index="${idx}">
+      <div class="news-badge">${item.type}</div>
+      <div class="featured-title">${item.title}</div>
+      <div class="featured-description">${item.fullContent || item.description || 'No description available.'}</div>
+      <div class="publish-date">Publish Date <span>${item.date || 'N/A'}</span></div>
+    </div>
+  `).join('');
+
+  // Create dots
+  dotsContainer.innerHTML = items.map((_, idx) => 
+    `<div class="dot ${idx === 0 ? 'active' : ''}" onclick="goToSlide(${idx})"></div>`
+  ).join('');
+}
+
 function goToSlide(index) {
-  if (index === currentSlide) return;
+  const slides = document.querySelectorAll('.featured-slide');
+  const dots = document.querySelectorAll('.dot');
   
-  const slides = document.querySelectorAll('.carousel-slide');
-  const dots = document.querySelectorAll('.carousel-dot');
+  slides.forEach(slide => slide.style.display = 'none');
+  dots.forEach(dot => dot.classList.remove('active'));
   
-  // Exit current slide
-  slides[currentSlide].classList.remove('active');
-  slides[currentSlide].classList.add('exit-left');
-  dots[currentSlide].classList.remove('active');
+  slides[index].style.display = 'block';
+  dots[index].classList.add('active');
   
-  // Enter new slide
-  setTimeout(() => {
-    slides[currentSlide].classList.remove('exit-left');
-    slides[index].classList.add('active');
-    dots[index].classList.add('active');
-    currentSlide = index;
-  }, 100);
-  
-  resetProgress();
+  featuredIndex = index;
+  resetCarousel();
 }
 
-function nextSlide() {
-  const nextIndex = (currentSlide + 1) % totalSlides;
-  goToSlide(nextIndex);
-}
-
-function startCarousel() {
-  if (carouselInterval) clearInterval(carouselInterval);
-  if (progressInterval) clearInterval(progressInterval);
-  
-  currentSlide = 0;
-  startProgress();
-  
-  carouselInterval = setInterval(() => {
-    nextSlide();
-  }, SLIDE_DURATION);
-}
-
-function startProgress() {
-  const progressBar = document.getElementById('carousel-progress-bar');
-  let progress = 0;
-  const increment = 100 / (SLIDE_DURATION / 100);
-  
-  progressBar.style.width = '0%';
-  
-  progressInterval = setInterval(() => {
-    progress += increment;
-    if (progress >= 100) {
-      progress = 0;
-    }
-    progressBar.style.width = progress + '%';
-  }, 100);
-}
-
-function resetProgress() {
-  if (progressInterval) clearInterval(progressInterval);
-  startProgress();
-  
+function startFeaturedCarousel(totalItems) {
   if (carouselInterval) clearInterval(carouselInterval);
   carouselInterval = setInterval(() => {
-    nextSlide();
-  }, SLIDE_DURATION);
+    const nextIndex = (featuredIndex + 1) % totalItems;
+    goToSlide(nextIndex);
+  }, 8000);
 }
 
-/* HORIZONTAL TICKER */
-function startTicker() {
-  const inner = document.getElementById('ticker-inner');
-  const wrap  = document.querySelector('.ticker-track');
-  
-  if (inner.scrollWidth <= wrap.clientWidth) {
-    inner.style.transform = 'translateX(0)';
-    return;
-  }
+function resetCarousel() {
+  if (carouselInterval) clearInterval(carouselInterval);
+  const totalItems = document.querySelectorAll('.featured-slide').length;
+  startFeaturedCarousel(totalItems);
+}
 
-  let pos = wrap.clientWidth, last = null;
-  function step(ts) {
-    if (!last) last = ts;
-    pos -= 130 * (ts - last) / 1000;
-    if (pos < -inner.scrollWidth) pos = wrap.clientWidth;
-    inner.style.transform = 'translateX(' + pos + 'px)';
-    last = ts;
-    requestAnimationFrame(step);
+function startListScroll() {
+  const track = document.getElementById('news-list-track');
+  const container = document.querySelector('.news-list-container');
+  
+  let position = 0;
+  const speed = 30;
+  
+  function scroll() {
+    const maxScroll = track.scrollHeight - container.clientHeight;
+    if (maxScroll <= 0) return;
+    
+    position += speed;
+    if (position >= maxScroll) position = 0;
+    
+    track.style.transform = `translateY(-${position}px)`;
+    requestAnimationFrame(scroll);
   }
-  requestAnimationFrame(step);
+  
+  scroll();
 }
 
 /* INIT */
