@@ -158,18 +158,45 @@
     letter-spacing: 1px;
   }
 
-  /* NEWS SCROLL AREA */
+  /* 🎠 CAROUSEL NEWS AREA */
   .news-area {
     flex: 1;
     overflow: hidden;
     position: relative;
     background: #fff;
+    display: flex;
+    flex-direction: column;
   }
-  .scroll-track {
-    position: absolute;
-    top: 0; left: 0; right: 0;
+
+  .carousel-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
     padding: 0 40px;
-    will-change: transform;
+  }
+
+  .carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px 0;
+    opacity: 0;
+    transform: translateX(100px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .carousel-slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .carousel-slide.exit-left {
+    opacity: 0;
+    transform: translateX(-100px);
   }
 
   .news-item {
@@ -178,6 +205,23 @@
     gap: 20px;
     padding: 18px 0;
     border-bottom: 1px solid #F2F2F2;
+    animation: fadeSlideIn 0.5s ease-out backwards;
+  }
+
+  .news-item:nth-child(1) { animation-delay: 0.1s; }
+  .news-item:nth-child(2) { animation-delay: 0.2s; }
+  .news-item:nth-child(3) { animation-delay: 0.3s; }
+  .news-item:nth-child(4) { animation-delay: 0.4s; }
+
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .item-num {
@@ -208,6 +252,45 @@
   .news-content { flex: 1; }
   .news-title { font-size: 21px; font-weight: 600; color: #1a1a1a; line-height: 1.35; }
   .news-date  { font-size: 13px; color: #999; margin-top: 5px; }
+
+  /* 🎠 CAROUSEL INDICATORS */
+  .carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 0;
+    flex-shrink: 0;
+  }
+
+  .carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ddd;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .carousel-dot.active {
+    width: 32px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #0097A7, #1B42B8);
+  }
+
+  /* 🎠 PROGRESS BAR */
+  .carousel-progress {
+    height: 3px;
+    background: #f0f0f0;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .carousel-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #0097A7, #1B42B8);
+    width: 0%;
+    transition: width 0.1s linear;
+  }
 
   /* TICKER */
   .ticker-bar {
@@ -307,10 +390,16 @@
       <span class="banner-right" id="banner-count"></span>
     </div>
 
-    <!-- NEWS LIST -->
+    <!-- 🎠 CAROUSEL NEWS AREA -->
     <div class="news-area">
-      <div class="scroll-track" id="scroll-track">
-        <div class="status-msg" id="loading-msg">Fetching latest updates from KU…</div>
+      <div class="carousel-container" id="carousel-container">
+        <!-- Slides will be injected here -->
+      </div>
+      <div class="carousel-indicators" id="carousel-indicators">
+        <!-- Dots will be injected here -->
+      </div>
+      <div class="carousel-progress">
+        <div class="carousel-progress-bar" id="carousel-progress-bar"></div>
       </div>
     </div>
 
@@ -355,45 +444,33 @@ function parseItems(html) {
   const items = [];
   const seen = new Set();
   
-  // Find all news article containers (more specific selector)
   const articles = doc.querySelectorAll('.news-item, .article-item, [class*="news"], [class*="article"]');
   
   articles.forEach(article => {
-    // Try to find the main title link
     const titleLink = article.querySelector('h3 a, h2 a, .title a, a[href*="/news/"]');
     
     if (!titleLink) return;
     
     const title = titleLink.textContent.trim();
     
-    // Skip if no title or too short
     if (!title || title.length < 10) return;
-    
-    // Skip if it's just a date
     if (/^\d{4}-\d{2}-\d{2}/.test(title)) return;
-    
-    // Skip duplicates
     if (seen.has(title)) return;
     seen.add(title);
     
-    // Extract date - look in multiple places
     let dateText = '';
     const dateEl = article.querySelector('.date, .post-date, time, [class*="date"]');
     if (dateEl) {
       dateText = dateEl.textContent.trim();
     } else {
-      // Try to find date in surrounding text
       const dateMatch = article.textContent.match(/(\d{4}-\d{2}-\d{2}(?:,\s*\w+)?)/);
       if (dateMatch) dateText = dateMatch[1];
     }
     
-    // Determine type
     const type = guessType(title);
-    
     items.push({ title, date: dateText, type });
   });
   
-  // If the specific selector didn't work, fall back to anchor-based parsing
   if (items.length < 3) {
     return parseItemsFallback(doc);
   }
@@ -409,10 +486,9 @@ function parseItemsFallback(doc) {
   anchors.forEach(a => {
     const title = a.textContent.trim();
     
-    // Skip invalid titles
     if (!title || title.length < 10) return;
-    if (/^\d{4}-\d{2}-\d{2}/.test(title)) return; // Skip date-only
-    if (title.toLowerCase().includes('more')) return; // Skip "more" links
+    if (/^\d{4}-\d{2}-\d{2}/.test(title)) return;
+    if (title.toLowerCase().includes('more')) return;
     if (title.toLowerCase().includes('read more')) return;
     
     if (seen.has(title)) return;
@@ -436,10 +512,8 @@ function parseItemsFallback(doc) {
   return items.length >= 3 ? items : null;
 }
 
-// 🎯 POINT TO NETLIFY FUNCTION (Server-side proxy)
 const KU_NEWS = '/.netlify/functions/fetch-news';
 
-// 🚀 FETCH WITH TIMEOUT
 async function loadNews() {
   const timeoutPromise = new Promise((_, reject) => 
     setTimeout(() => reject(new Error('Request timed out after 10 seconds')), 10000)
@@ -467,23 +541,34 @@ async function loadNews() {
 function badgeCls(type) { return type === 'event' ? 'badge-event' : type === 'news' ? 'badge-news' : 'badge-notice'; }
 function badgeLbl(type) { return type === 'event' ? 'Event' : type === 'news' ? 'News' : 'Notice'; }
 
+// 🎠 CAROUSEL VARIABLES
+let carouselItems = [];
+let currentSlide = 0;
+let totalSlides = 0;
+let carouselInterval = null;
+let progressInterval = null;
+const ITEMS_PER_SLIDE = 4;
+const SLIDE_DURATION = 6000; // 6 seconds per slide
+
 function renderNews(result) {
-  const track = document.getElementById('scroll-track');
+  const container = document.getElementById('carousel-container');
+  const indicators = document.getElementById('carousel-indicators');
   const tickerInner = document.getElementById('ticker-inner');
 
-  // 🚨 HANDLE FAILURE
   if (!result.success) {
     document.getElementById('count-val').textContent = '0';
     document.getElementById('banner-count').textContent = 'Error';
     
-    track.innerHTML = `
-      <div class="status-msg" style="color: #e53e3e; font-weight: 600; font-size: 22px; padding-top: 100px;">
-        ⚠️ Failed to fetch live data
-        <div style="font-size: 16px; color: #555; font-weight: 400; margin-top: 12px; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.5;">
-          Reason: <strong>${result.error}</strong><br>
-          <span style="font-size: 14px; color: #888; margin-top: 8px; display: block;">
-            Please check if Netlify Function is deployed correctly at: /.netlify/functions/fetch-news
-          </span>
+    container.innerHTML = `
+      <div class="carousel-slide active">
+        <div class="status-msg" style="color: #e53e3e; font-weight: 600; font-size: 22px; padding-top: 100px;">
+          ⚠️ Failed to fetch live data
+          <div style="font-size: 16px; color: #555; font-weight: 400; margin-top: 12px; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+            Reason: <strong>${result.error}</strong><br>
+            <span style="font-size: 14px; color: #888; margin-top: 8px; display: block;">
+              Please check if Netlify Function is deployed correctly at: /.netlify/functions/fetch-news
+            </span>
+          </div>
         </div>
       </div>
     `;
@@ -493,53 +578,117 @@ function renderNews(result) {
     return;
   }
 
-  // ✅ HANDLE SUCCESS
   const items = result.items;
+  carouselItems = items;
   document.getElementById('count-val').textContent = items.length;
   document.getElementById('banner-count').textContent = items.length + ' items';
 
-  const doubled = [...items, ...items];
-  track.innerHTML = doubled.map((item, i) => `
-    <div class="news-item">
-      <span class="item-num">${String((i % items.length) + 1).padStart(2,'0')}</span>
-      <span class="news-badge ${badgeCls(item.type)}">${badgeLbl(item.type)}</span>
-      <div class="news-content">
-        <div class="news-title">${item.title}</div>
-        ${item.date ? '<div class="news-date">' + item.date + '</div>' : ''}
-      </div>
-    </div>`).join('');
+  // Create slides (4 items per slide)
+  totalSlides = Math.ceil(items.length / ITEMS_PER_SLIDE);
+  container.innerHTML = '';
+  indicators.innerHTML = '';
 
+  for (let slideIdx = 0; slideIdx < totalSlides; slideIdx++) {
+    const slideItems = items.slice(slideIdx * ITEMS_PER_SLIDE, (slideIdx + 1) * ITEMS_PER_SLIDE);
+    
+    const slideDiv = document.createElement('div');
+    slideDiv.className = 'carousel-slide' + (slideIdx === 0 ? ' active' : '');
+    slideDiv.innerHTML = slideItems.map((item, i) => {
+      const globalIdx = slideIdx * ITEMS_PER_SLIDE + i;
+      return `
+        <div class="news-item">
+          <span class="item-num">${String(globalIdx + 1).padStart(2,'0')}</span>
+          <span class="news-badge ${badgeCls(item.type)}">${badgeLbl(item.type)}</span>
+          <div class="news-content">
+            <div class="news-title">${item.title}</div>
+            ${item.date ? '<div class="news-date">' + item.date + '</div>' : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    container.appendChild(slideDiv);
+
+    // Create indicator dot
+    const dot = document.createElement('div');
+    dot.className = 'carousel-dot' + (slideIdx === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(slideIdx);
+    indicators.appendChild(dot);
+  }
+
+  // Update ticker
   tickerInner.innerHTML = 
     items.map(i => `<span class="ticker-item">${i.title}${i.date ? '  ·  ' + i.date : ''}</span>`).join('') +
     '<span class="ticker-item">Department of Artificial Intelligence · Kathmandu University · doai.ku.edu.np · ai_office@ku.edu.np · +977-11-499429</span>';
 
-  startScroll();
   startTicker();
+  startCarousel();
 }
 
-/* VERTICAL AUTO-SCROLL */
-let vsRAF = null;
-function startScroll() {
-  const track = document.getElementById('scroll-track');
-  if (vsRAF) cancelAnimationFrame(vsRAF);
+// 🎠 CAROUSEL FUNCTIONS
+function goToSlide(index) {
+  if (index === currentSlide) return;
   
-  if (track.scrollHeight <= track.clientHeight) {
-    track.style.transform = 'translateY(0)';
-    return;
-  }
-
+  const slides = document.querySelectorAll('.carousel-slide');
+  const dots = document.querySelectorAll('.carousel-dot');
+  
+  // Exit current slide
+  slides[currentSlide].classList.remove('active');
+  slides[currentSlide].classList.add('exit-left');
+  dots[currentSlide].classList.remove('active');
+  
+  // Enter new slide
   setTimeout(() => {
-    const halfH = track.scrollHeight / 2;
-    const speed = 52; 
-    let startT  = null;
-    function step(ts) {
-      if (!startT) startT = ts;
-      const moved = ((ts - startT) / 1000 * speed) % halfH;
-      track.style.transform = 'translateY(-' + moved + 'px)';
-      vsRAF = requestAnimationFrame(step);
+    slides[currentSlide].classList.remove('exit-left');
+    slides[index].classList.add('active');
+    dots[index].classList.add('active');
+    currentSlide = index;
+  }, 100);
+  
+  resetProgress();
+}
+
+function nextSlide() {
+  const nextIndex = (currentSlide + 1) % totalSlides;
+  goToSlide(nextIndex);
+}
+
+function startCarousel() {
+  if (carouselInterval) clearInterval(carouselInterval);
+  if (progressInterval) clearInterval(progressInterval);
+  
+  currentSlide = 0;
+  startProgress();
+  
+  carouselInterval = setInterval(() => {
+    nextSlide();
+  }, SLIDE_DURATION);
+}
+
+function startProgress() {
+  const progressBar = document.getElementById('carousel-progress-bar');
+  let progress = 0;
+  const increment = 100 / (SLIDE_DURATION / 100);
+  
+  progressBar.style.width = '0%';
+  
+  progressInterval = setInterval(() => {
+    progress += increment;
+    if (progress >= 100) {
+      progress = 0;
     }
-    vsRAF = requestAnimationFrame(step);
-  }, 300);
+    progressBar.style.width = progress + '%';
+  }, 100);
+}
+
+function resetProgress() {
+  if (progressInterval) clearInterval(progressInterval);
+  startProgress();
+  
+  if (carouselInterval) clearInterval(carouselInterval);
+  carouselInterval = setInterval(() => {
+    nextSlide();
+  }, SLIDE_DURATION);
 }
 
 /* HORIZONTAL TICKER */
@@ -569,7 +718,6 @@ loadNews()
   .then(items => renderNews({ success: true, items }))
   .catch(err => renderNews({ success: false, error: err.message }));
 
-// Refresh every 30 minutes
 setInterval(() => {
   loadNews()
     .then(items => renderNews({ success: true, items }))
